@@ -12,19 +12,26 @@ const unsigned int SCR_HEIGHT = 600;
 
 const char* vertexShaderSource = "#version 330 core\n"  // 版本声明
 	"layout (location = 0) in vec3 aPos;\n"  // layout (location = 0) 设定了数据变量的位置值，使用in关键字声明所有的输入顶点属性
+	"layout (location = 1) in vec3 cc;\n"
+	"out vec3 our;\n"
 	"void main()\n"
 	"{\n"
 	"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"  // gl_Position设置的值会成为顶点着色器的输出
+	"	our = cc;\n"
 	"}\n";
 
 const char* fragmentShaderSource = "#version 330 core\n"
 	"out vec4 FragColor;\n"  // 使用out关键字声明输出变量
+	"in vec3 our;\n"
 	"void main()\n"
 	"{\n"
-	"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+	"	// FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+	"	FragColor = vec4(our, 1.0);\n"
 	"}\n"; 
 
 void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int* shaderProgram) {
+
+
 	// 创建一个顶点着色器对象
 	unsigned int vertexShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -92,11 +99,18 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 	//};
 
 	// 渲染四边形
+	//float vertices[] = {
+	//	0.5f, 0.5f, 0.0f,		// 右上角
+	//	0.5f, -0.5f, 0.0f,		// 右下角
+	//	-0.5f, -0.5f, 0.0f,		// 左下角
+	//	-0.5f, 0.5f, 0.0f,		// 左上角
+	//};
+
+	// 三角形带颜色
 	float vertices[] = {
-		0.5f, 0.5f, 0.0f,		// 右上角
-		0.5f, -0.5f, 0.0f,		// 右下角
-		-0.5f, -0.5f, 0.0f,		// 左下角
-		-0.5f, 0.5f, 0.0f,		// 左上角
+		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
 	};
 
 	unsigned int indices[] = {
@@ -140,9 +154,13 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 		参数5，指定步长stride，说明连续的顶点属性组之间的间隔，简单说就是整个属性第二次出现的地方到整个数组0位置之间有多少字节
 		参数6，表示位置数据在缓冲中起始位置的偏移量
 	*/
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	// 以顶点属性位置值作为参数，启用顶点属性
 	glEnableVertexAttribArray(0);
+
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	// 解绑VBO，允许，因为glVertexAttribPointer已经将VBO注册为顶点属性绑定的VBO
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -171,6 +189,12 @@ void draw(unsigned int VAO, unsigned int shaderProgram) {
 	glUseProgram(shaderProgram);
 	glBindVertexArray(VAO);
 
+	//// 获取运行的秒数
+	//float timeValue = glfwGetTime();
+	//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+	//// 查询uniform变量的位置值
+	//int vertexColorLocation = glGetUniformLocation(shaderProgram, "cc");
+	//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
 	/*
 		绘制函数
@@ -178,7 +202,7 @@ void draw(unsigned int VAO, unsigned int shaderProgram) {
 		参数2，指定了顶点数组的起始索引
 		参数3，指定打算绘制多少个顶点
 	*/
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	/*
 		指明从索引缓冲渲染，该函数从当前绑定到的GL_ELEMENT_ARRAY_BUFFER目标的EBO中获取索引
@@ -187,7 +211,7 @@ void draw(unsigned int VAO, unsigned int shaderProgram) {
 		参数3，是索引的类型
 		参数4，指定EBO中的偏移量
 	*/
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 // 清理资源
