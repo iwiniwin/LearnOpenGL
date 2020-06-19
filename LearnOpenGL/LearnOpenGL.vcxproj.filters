@@ -15,11 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LearnOpenGL.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="glad\src\glad.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\LearnOpenGL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

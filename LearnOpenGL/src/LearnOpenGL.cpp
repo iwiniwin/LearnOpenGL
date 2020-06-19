@@ -2,6 +2,7 @@
 using namespace std;
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -10,86 +11,11 @@ void processInput(GLFWwindow* window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-const char* vertexShaderSource = "#version 330 core\n"  // 版本声明
-	"layout (location = 0) in vec3 aPos;\n"  // layout (location = 0) 设定了数据变量的位置值，使用in关键字声明所有的输入顶点属性
-	"layout (location = 1) in vec3 cc;\n"
-	"out vec3 our;\n"
-	"void main()\n"
-	"{\n"
-	"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"  // gl_Position设置的值会成为顶点着色器的输出
-	"	our = cc;\n"
-	"}\n";
-
-const char* fragmentShaderSource = "#version 330 core\n"
-	"out vec4 FragColor;\n"  // 使用out关键字声明输出变量
-	"in vec3 our;\n"
-	"void main()\n"
-	"{\n"
-	"	// FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-	"	FragColor = vec4(our, 1.0);\n"
-	"}\n"; 
-
 void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int* shaderProgram) {
 
 
-	// 创建一个顶点着色器对象
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	// 把着色器源码附着到着色器对象上
-	// 参数2指定了传递的源码字符串数量
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	// 编译着色器
-	glCompileShader(vertexShader);
-
-	// 检测编译是否成功
-	int success;
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-	// 如果失败，获取错误信息
-	if (!success) {
-		char infoLog[512];
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << endl;
-	}
-
-
-	// 创建一个片段着色器对象
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		char infoLog[512];
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << endl;
-	}
-
-	/*
-		着色器程序对象是多个着色器合并之后并最终链接完成的版本，如果要使用之前编译的着色器，
-		我们必须把它们链接为一个着色器程序对象，然后在渲染对象的时候激活这个着色器程序
-	*/
-
-	// 创建一个着色器程序对象
-	*shaderProgram = glCreateProgram();
-	// 将之前编译的着色器附加到程序对象上
-	glAttachShader(*shaderProgram, vertexShader);
-	glAttachShader(*shaderProgram, fragmentShader);
-	// 链接
-	glLinkProgram(*shaderProgram);
-
-	// 检测链接是否成功
-	int ret;
-	glGetProgramiv(*shaderProgram, GL_LINK_STATUS, &ret);
-	// 如果失败，获取错误信息
-	if (!ret) {
-		char infoLog[512];
-		glGetProgramInfoLog(*shaderProgram, 512, NULL, infoLog);
-	}
-
-	// 链接之后，记得删除着色器对象，不再需要了
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	Shader myShader("..\\shader.vs", "..\\shader.fs");
+	myShader.use();
 
 	// 渲染三角形，三个顶点
 	//float vertices[] = {
@@ -110,7 +36,7 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 	float vertices[] = {
 		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
 		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
 	};
 
 	unsigned int indices[] = {
