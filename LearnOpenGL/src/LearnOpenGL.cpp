@@ -3,6 +3,8 @@ using namespace std;
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "shader.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -11,11 +13,63 @@ void processInput(GLFWwindow* window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+void loadTexture(const char* fileName) {
+
+}
+
+unsigned int createTexture(const char* fileName, unsigned int format, bool reverse = false) {
+	unsigned int texture;
+	// 生成1个纹理数量，并存储在后面的unsigned int数组中
+	glGenTextures(1, &texture);
+	// 绑定纹理，之后任何的纹理指令都可以配置当前绑定的纹理
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	// 为当前绑定的纹理对象设置环绕，过滤方式
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  // 缩小过滤
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  // 放大过滤
+
+	// 加载图片，nrChannels表示颜色通道的个数
+	int width, height, nrChannels;
+	if (reverse) {
+		stbi_set_flip_vertically_on_load(true);
+	}
+	unsigned char* data = stbi_load(fileName, &width, &height, &nrChannels, 0);
+	if (data) {
+		/*
+			生成一个纹理，调用了glTexImage2D以后，当前绑定的纹理对象就会被附加上纹理图像
+			参数1，指定了纹理坐标，任何绑定了GL_TEXTURE_1D和GL_TEXTURE_3D的纹理不会受到影响
+			参数2，为纹理指定多级渐远纹理的级别
+			参数3，指定将纹理存储为何种格式
+			参数4，设置最终纹理的宽度
+			参数5，设置最终纹理的高度
+			参数6，总是应该被设置为0，历史遗留问题
+			参数7，定义了源图的格式
+			参数8，定义了源图的数据类型
+			参数9，指定了真正的图像数据
+		*/
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		// 生成需要的多级渐远纹理
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		//glBindTexture(GL_TEXTURE_2D, texture);
+	}
+	else {
+		cerr << "failed to load texture" << endl;
+	}
+
+	stbi_image_free(data);
+	return texture;
+}
+
 void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int* shaderProgram) {
 
 
 	Shader myShader("..\\shader.vs", "..\\shader.fs");
-	myShader.use();
+	*shaderProgram = myShader.ID;
+	//myShader.use();
+	glUseProgram(myShader.ID);
 
 	// 渲染三角形，三个顶点
 	//float vertices[] = {
@@ -25,19 +79,19 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 	//};
 
 	// 渲染四边形
-	//float vertices[] = {
-	//	0.5f, 0.5f, 0.0f,		// 右上角
-	//	0.5f, -0.5f, 0.0f,		// 右下角
-	//	-0.5f, -0.5f, 0.0f,		// 左下角
-	//	-0.5f, 0.5f, 0.0f,		// 左上角
-	//};
+	float vertices[] = {
+		0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 	1.0f, 1.0f,	// 右上角
+		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 	1.0f, 0.0f,	// 右下角
+		-0.5f, -0.5f, 0.0f,0.0f, 0.0f, 1.0f, 	0.0f, 0.0f,	// 左下角
+		-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// 左上角
+	};
 
 	// 三角形带颜色
-	float vertices[] = {
-		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
-	};
+	//float vertices[] = {
+	//	0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 
+	//	-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+	//	0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+	//};
 
 	unsigned int indices[] = {
 		0, 1, 3,
@@ -80,22 +134,25 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 		参数5，指定步长stride，说明连续的顶点属性组之间的间隔，简单说就是整个属性第二次出现的地方到整个数组0位置之间有多少字节
 		参数6，表示位置数据在缓冲中起始位置的偏移量
 	*/
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	// 以顶点属性位置值作为参数，启用顶点属性
 	glEnableVertexAttribArray(0);
 
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
 	// 解绑VBO，允许，因为glVertexAttribPointer已经将VBO注册为顶点属性绑定的VBO
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// 注意，当VAO激活时，不能解绑EBO。因为VAO不仅会存储glBindBuffer的函数调用，也会存储glBindBuffer的函数调用，这样VAO中就不会有EBO配置了
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	// 解绑VAO
-	glBindVertexArray(0);
+	//glBindVertexArray(0);
 
 	
 	
@@ -105,6 +162,18 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 
 	// 设置会默认模式
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
+	unsigned int tex0 = createTexture("..\\container.jpg", GL_RGB);
+	unsigned int tex1 = createTexture("..\\awesomeface.png", GL_RGBA, true);
+
+	glUniform1i(glGetUniformLocation(myShader.ID, "texture1"), 0);
+	glUniform1i(glGetUniformLocation(myShader.ID, "texture2"), 1);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, tex1);
 }
 
 void draw(unsigned int VAO, unsigned int shaderProgram) {
@@ -122,13 +191,14 @@ void draw(unsigned int VAO, unsigned int shaderProgram) {
 	//int vertexColorLocation = glGetUniformLocation(shaderProgram, "cc");
 	//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
+
 	/*
 		绘制函数
 		参数1，指明打算绘制的OpenGL图元的类型
 		参数2，指定了顶点数组的起始索引
 		参数3，指定打算绘制多少个顶点
 	*/
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	/*
 		指明从索引缓冲渲染，该函数从当前绑定到的GL_ELEMENT_ARRAY_BUFFER目标的EBO中获取索引
@@ -137,7 +207,7 @@ void draw(unsigned int VAO, unsigned int shaderProgram) {
 		参数3，是索引的类型
 		参数4，指定EBO中的偏移量
 	*/
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 // 清理资源
