@@ -6,16 +6,16 @@ using namespace std;
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "glm.hpp"
+#include "gtc/matrix_transform.hpp"
+#include "gtc/type_ptr.hpp"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
-void loadTexture(const char* fileName) {
-
-}
 
 unsigned int createTexture(const char* fileName, unsigned int format, bool reverse = false) {
 	unsigned int texture;
@@ -64,7 +64,6 @@ unsigned int createTexture(const char* fileName, unsigned int format, bool rever
 }
 
 void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int* shaderProgram) {
-
 
 	Shader myShader("..\\shader.vs", "..\\shader.fs");
 	*shaderProgram = myShader.ID;
@@ -174,11 +173,28 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 	glBindTexture(GL_TEXTURE_2D, tex0);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, tex1);
+
+	
 }
 
 void draw(unsigned int VAO, unsigned int shaderProgram) {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	// 默认是一个4x4矩阵
+	glm::mat4 trans;
+	trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+	// 沿z轴旋转
+	trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+	unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+	/*
+		参数1，uniform的位置值
+		参数2，将要发送的矩阵的个数
+		参数3，是否对矩阵进行置换（交换行和列）
+		参数4，真正的矩阵数据
+	*/
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
 
 	// 激活这个程序对象，激活后，每个着色器调用和渲染调用都会使用这个程序对象
 	glUseProgram(shaderProgram);
