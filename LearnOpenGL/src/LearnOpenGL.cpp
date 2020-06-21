@@ -78,11 +78,69 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 	//};
 
 	// 渲染四边形
+	//float vertices[] = {
+	//	0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 	1.0f, 1.0f,	// 右上角
+	//	0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 	1.0f, 0.0f,	// 右下角
+	//	-0.5f, -0.5f, 0.0f,0.0f, 0.0f, 1.0f, 	0.0f, 0.0f,	// 左下角
+	//	-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// 左上角
+	//};
+
+	// 渲染立方体
+	//float vertices[] = {
+	//	0.5f, 0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 	1.0f, 1.0f,	// 右上角
+	//	0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 	1.0f, 0.0f,	// 右下角
+	//	-0.5f, -0.5f, -0.5f,0.0f, 0.0f, 1.0f, 	0.0f, 0.0f,	// 左下角
+	//	-0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// 左上角
+
+	//	0.5f, 0.5f, 0.5f,  1.0f, 0.0f, 0.0f, 	1.0f, 1.0f,	// 右上角
+	//	0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 	1.0f, 0.0f,	// 右下角
+	//	-0.5f, -0.5f, 0.5f,0.0f, 0.0f, 1.0f, 	0.0f, 0.0f,	// 左下角
+	//	-0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// 左上角
+	//};
+
+
 	float vertices[] = {
-		0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f, 	1.0f, 1.0f,	// 右上角
-		0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 	1.0f, 0.0f,	// 右下角
-		-0.5f, -0.5f, 0.0f,0.0f, 0.0f, 1.0f, 	0.0f, 0.0f,	// 左下角
-		-0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f,	0.0f, 1.0f,	// 左上角
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 
 	// 三角形带颜色
@@ -95,6 +153,23 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 	unsigned int indices[] = {
 		0, 1, 3,
 		1, 2, 3,
+
+		0, 1, 5,
+		0, 4, 5,
+
+		4, 5, 6,
+		4, 6, 7,
+
+		7, 6, 3,
+		2, 6, 3,
+
+		0, 3, 4,
+		3, 4, 7,
+
+		1, 2, 5, 
+		2, 5, 6,
+
+
 	};
 	
 	glGenVertexArrays(1, VAO);
@@ -133,15 +208,15 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 		参数5，指定步长stride，说明连续的顶点属性组之间的间隔，简单说就是整个属性第二次出现的地方到整个数组0位置之间有多少字节
 		参数6，表示位置数据在缓冲中起始位置的偏移量
 	*/
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	// 以顶点属性位置值作为参数，启用顶点属性
 	glEnableVertexAttribArray(0);
 
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	/*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);*/
 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
 	// 解绑VBO，允许，因为glVertexAttribPointer已经将VBO注册为顶点属性绑定的VBO
@@ -174,26 +249,58 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, tex1);
 
-	
+	// 开启深度测试
+	glEnable(GL_DEPTH_TEST);
+	// 关闭深度测试
+	//glDisable(GL_DEPTH_TEST);
 }
+
 
 void draw(unsigned int VAO, unsigned int shaderProgram) {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	// 清除颜色缓冲和深度缓冲
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// 默认是一个4x4矩阵
-	glm::mat4 trans;
-	trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-	// 沿z轴旋转
-	trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
-	unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+	// 模型矩阵
+	//glm::mat4 model;
+	////model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+	// 观察矩阵
+	glm::mat4 view;
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
+	// 投影矩阵
+	glm::mat4 projection;
+	projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
+	//unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
 	/*
 		参数1，uniform的位置值
 		参数2，将要发送的矩阵的个数
 		参数3，是否对矩阵进行置换（交换行和列）
 		参数4，真正的矩阵数据
 	*/
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+	unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
+	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+	
 
 
 	// 激活这个程序对象，激活后，每个着色器调用和渲染调用都会使用这个程序对象
@@ -214,7 +321,18 @@ void draw(unsigned int VAO, unsigned int shaderProgram) {
 		参数2，指定了顶点数组的起始索引
 		参数3，指定打算绘制多少个顶点
 	*/
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	//glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	for (unsigned int i = 0; i < 10; i++) {
+		glm::mat4 model;
+		model = glm::translate(model, cubePositions[i]);
+		float angle = 20.0f * i;
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
 
 	/*
 		指明从索引缓冲渲染，该函数从当前绑定到的GL_ELEMENT_ARRAY_BUFFER目标的EBO中获取索引
@@ -223,7 +341,7 @@ void draw(unsigned int VAO, unsigned int shaderProgram) {
 		参数3，是索引的类型
 		参数4，指定EBO中的偏移量
 	*/
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
 // 清理资源
