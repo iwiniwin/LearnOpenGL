@@ -255,19 +255,33 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 	//glDisable(GL_DEPTH_TEST);
 }
 
+// 摄像机位置
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 void draw(unsigned int VAO, unsigned int shaderProgram) {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	// 清除颜色缓冲和深度缓冲
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	
+	
+	glm::mat4 view;
+	// 参数1，相机位置，参数2，目标位置，参数3，向上的向量
+	// cameraPos + cameraFront 保证无论摄像机位置是多少，摄像机一直是指向前方的
+	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
 	// 模型矩阵
 	//glm::mat4 model;
 	////model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 	// 观察矩阵
-	glm::mat4 view;
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
+	//glm::mat4 view;
+	//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
 	// 投影矩阵
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -383,6 +397,11 @@ int main() {
 
 	// 渲染循环，GLFW退出前一直运行
 	while (!glfwWindowShouldClose(window)) {  // 循环每次开始前检查GLFW是否要退出
+
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		// 处理输入
 		processInput(window);
 		
@@ -415,5 +434,19 @@ void processInput(GLFWwindow* window) {
 	// 按下esc时，关闭glfw，下次循环条件检测失败，会退出程序
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
+	}
+
+	float cameraSpeed = 2.5 * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		cameraPos += cameraSpeed * cameraFront;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		cameraPos -= cameraSpeed * cameraFront;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	}
 }
