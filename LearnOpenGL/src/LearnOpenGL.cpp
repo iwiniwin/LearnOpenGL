@@ -12,6 +12,8 @@ using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -263,12 +265,12 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+
+float fov = 45;
 void draw(unsigned int VAO, unsigned int shaderProgram) {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	// 清除颜色缓冲和深度缓冲
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	
 	
 	glm::mat4 view;
 	// 参数1，相机位置，参数2，目标位置，参数3，向上的向量
@@ -284,7 +286,14 @@ void draw(unsigned int VAO, unsigned int shaderProgram) {
 	//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
 	// 投影矩阵
 	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	/*
+		构造一个透视投影矩阵
+		参数1，指定了fov的值，表示的是视野
+		参数2，设置了宽高比，由视口的宽除以高所得
+		参数3，设置了近平面距离摄像机的距离
+		参数4，设置了远平面距离摄像机的距离穿透
+	*/
+	projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
@@ -392,6 +401,12 @@ int main() {
 		return -1;
 	}
 
+	// 设置隐藏光标，且光标不会离开窗口
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+
 	unsigned int VBO, EBO, VAO, shaderProgram;
 	init(&VBO, &EBO, &VAO, &shaderProgram);
 
@@ -449,4 +464,52 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	}
+}
+
+float lastX = 400, lastY = 300;
+bool firstMouse = true;
+float yaw = 0;
+float pitch = 0;
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+	
+	if (firstMouse) {
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;  // 这里是相反的，y坐标是从底部往顶部依次增大的
+	lastX = xpos;
+	lastY = ypos;
+
+	float sensitivity = 0.0005f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	//cout << glm::radians(xoffset) << "   vvvv" << endl;
+
+	yaw += xoffset;
+	pitch += yoffset;
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	// 根据偏航角计算方向向量
+	glm::vec3 front;
+	front.y = sin(glm::radians(pitch));
+	front.x = cos(glm::radians(pitch)) * glm::radians(cos(yaw));
+	front.z = cos(glm::radians(pitch)) * glm::radians(sin(yaw));
+	cameraFront = glm::normalize(front);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+	cout << yoffset << " yoffset" << endl;
+	if (fov >= 1.0f && fov <= 45.0f)
+		fov -= yoffset;
+	if (fov <= 1.0f)
+		fov = 1.0f;
+	if (fov >= 45.0f)
+		fov = 45.0f;
 }
