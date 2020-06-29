@@ -262,6 +262,11 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
+float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
+bool firstMouse = true;
+float yaw = -90.0f;  // 初始是-90.0f，是因为0度时，是指向右，所以向左旋转90度，使其指向前方
+float pitch = 0;
+
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
@@ -466,10 +471,6 @@ void processInput(GLFWwindow* window) {
 	}
 }
 
-float lastX = 400, lastY = 300;
-bool firstMouse = true;
-float yaw = 0;
-float pitch = 0;
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	
 	if (firstMouse) {
@@ -483,11 +484,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	lastX = xpos;
 	lastY = ypos;
 
-	float sensitivity = 0.0005f;
+	float sensitivity = 0.02f;
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
-
-	//cout << glm::radians(xoffset) << "   vvvv" << endl;
 
 	yaw += xoffset;
 	pitch += yoffset;
@@ -499,17 +498,15 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	// 根据偏航角计算方向向量
 	glm::vec3 front;
 	front.y = sin(glm::radians(pitch));
-	front.x = cos(glm::radians(pitch)) * glm::radians(cos(yaw));
-	front.z = cos(glm::radians(pitch)) * glm::radians(sin(yaw));
+	front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+	front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
 	cameraFront = glm::normalize(front);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-	cout << yoffset << " yoffset" << endl;
-	if (fov >= 1.0f && fov <= 45.0f)
-		fov -= yoffset;
-	if (fov <= 1.0f)
+	fov -= yoffset;
+	if (fov < 1.0f)
 		fov = 1.0f;
-	if (fov >= 45.0f)
+	if (fov > 45.0f)
 		fov = 45.0f;
 }
