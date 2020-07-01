@@ -3,6 +3,7 @@ using namespace std;
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "shader.h"
+#include "camera.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -18,6 +19,15 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+// camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
+bool firstMouse = true;
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 unsigned int createTexture(const char* fileName, unsigned int format, bool reverse = false) {
 	unsigned int texture;
@@ -257,21 +267,6 @@ void init(unsigned int* VBO, unsigned int* EBO, unsigned int* VAO, unsigned int*
 	//glDisable(GL_DEPTH_TEST);
 }
 
-// 摄像机位置
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
-bool firstMouse = true;
-float yaw = -90.0f;  // 初始是-90.0f，是因为0度时，是指向右，所以向左旋转90度，使其指向前方
-float pitch = 0;
-
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
-
-
-float fov = 45;
 void draw(unsigned int VAO, unsigned int shaderProgram) {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	// 清除颜色缓冲和深度缓冲
@@ -280,7 +275,7 @@ void draw(unsigned int VAO, unsigned int shaderProgram) {
 	glm::mat4 view;
 	// 参数1，相机位置，参数2，目标位置，参数3，向上的向量
 	// cameraPos + cameraFront 保证无论摄像机位置是多少，摄像机一直是指向前方的
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	view = camera.GetViewMatrix();
 
 	// 模型矩阵
 	//glm::mat4 model;
@@ -298,7 +293,7 @@ void draw(unsigned int VAO, unsigned int shaderProgram) {
 		参数3，设置了近平面距离摄像机的距离
 		参数4，设置了远平面距离摄像机的距离穿透
 	*/
-	projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
@@ -458,16 +453,16 @@ void processInput(GLFWwindow* window) {
 
 	float cameraSpeed = 2.5 * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		cameraPos += cameraSpeed * cameraFront;
+		camera.ProcessKeyboard(FORWARD, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		cameraPos -= cameraSpeed * cameraFront;
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.ProcessKeyboard(LEFT, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.ProcessKeyboard(RIGHT, deltaTime);
 	}
 }
 
@@ -484,29 +479,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	lastX = xpos;
 	lastY = ypos;
 
-	float sensitivity = 0.02f;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
-
-	yaw += xoffset;
-	pitch += yoffset;
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-
-	// 根据偏航角计算方向向量
-	glm::vec3 front;
-	front.y = sin(glm::radians(pitch));
-	front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-	front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-	cameraFront = glm::normalize(front);
+	camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-	fov -= yoffset;
-	if (fov < 1.0f)
-		fov = 1.0f;
-	if (fov > 45.0f)
-		fov = 45.0f;
+	camera.ProcessMouseScroll(yoffset);
 }
