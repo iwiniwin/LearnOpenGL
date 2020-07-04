@@ -24,5 +24,5 @@ private:
 
 };
 
-unsigned int createTexture(const char* fileName, unsigned int format, bool reverse);
+unsigned int createTexture(const char* fileName, unsigned int format, bool reverse = false);
 Program initProgram();

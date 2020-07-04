@@ -9,8 +9,8 @@ using namespace std;
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
 
-extern int SCR_WIDTH;
-extern int SCR_HEIGHT;
+extern const unsigned int SCR_WIDTH;
+extern const unsigned int SCR_HEIGHT;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -35,6 +35,9 @@ void update(GLFWwindow* window, float deltaTime) {
 	glBindTexture(GL_TEXTURE_2D, program.tex0);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, program.tex1);
+
+	// 激活这个程序对象，激活后，每个着色器调用和渲染调用都会使用这个程序对象
+	glUseProgram(program.ID);
 
 	glm::mat4 view;
 	// 参数1，相机位置，参数2，目标位置，参数3，向上的向量
@@ -88,8 +91,7 @@ void update(GLFWwindow* window, float deltaTime) {
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 
-	// 激活这个程序对象，激活后，每个着色器调用和渲染调用都会使用这个程序对象
-	glUseProgram(program.ID);
+	
 	glBindVertexArray(program.VAO);
 
 

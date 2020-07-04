@@ -27,18 +27,24 @@
     <ClCompile Include="src\program.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\window.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\shader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\window.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\program.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stb_image.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -23,11 +23,13 @@
     <ClCompile Include="src\data.cpp" />
     <ClCompile Include="src\LearnOpenGL.cpp" />
     <ClCompile Include="src\program.cpp" />
+    <ClCompile Include="src\window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="camera.h" />
+    <ClInclude Include="include\camera.h" />
     <ClInclude Include="include\program.h" />
     <ClInclude Include="include\shader.h" />
+    <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\window.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

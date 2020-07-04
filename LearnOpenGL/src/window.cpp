@@ -1,11 +1,11 @@
+#include "glad/glad.h"	// glad用来管理OpenGL函数指针
 #include "window.h"
 #include <iostream>
 using namespace std;
-#include "glad/glad.h"	// glad用来管理OpenGL函数指针
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+extern const unsigned int SCR_WIDTH = 800;
+extern const unsigned int SCR_HEIGHT = 600;
 
 GLFWwindow* initWindow() {
 	// 初始化glfw
@@ -39,12 +39,14 @@ GLFWwindow* initWindow() {
 }
 
 float lastFrame = 0.0f;
+float deltaTime = 0.0f;
 void render_loop(GLFWwindow* window, Update update, OnDestroy onDestroy) {
 	while (!glfwWindowShouldClose(window)) {
 		float currentTime = glfwGetTime();
 		deltaTime = currentTime - lastFrame;
+		lastFrame = currentTime;
+
 		update(window, deltaTime);
-		lastFrame = currentTime();
 
 		// 检查并调用事件
 		glfwPollEvents();

@@ -63,7 +63,7 @@ Program initProgram() {
 	glEnableVertexAttribArray(1);*/
 
 	// 纹理坐标
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)3);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
 	// 设置线框模式，参数1表示应用到所有三角形的正面和背面，参数2表示用线来绘制
@@ -72,9 +72,10 @@ Program initProgram() {
 	// 设置回默认模式
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	unsigned int tex0 = createTexture("..\\container.jpg", GL_RGB, false);
+	unsigned int tex0 = createTexture("..\\container.jpg", GL_RGB);
 	unsigned int tex1 = createTexture("..\\awesomeface.png", GL_RGBA, true);
 
+	shader.use();
 	// glUniform1i给纹理采样器分配一个位置值
 	glUniform1i(glGetUniformLocation(shader.ID, "texture1"), 0);
 	shader.setInt("texture2", 1);
@@ -100,7 +101,7 @@ Program initProgram() {
 	return program;
 }
 
-unsigned int createTexture(const char* fileName, unsigned int format, bool reverse = false) {
+unsigned int createTexture(const char* fileName, unsigned int format, bool reverse) {
 	unsigned int texture;
 	// 生成1个纹理数量，并存储在后面的unsigned int数组中，这里只是单独的unsigned int
 	glGenTextures(1, &texture);
