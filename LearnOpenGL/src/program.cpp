@@ -57,7 +57,7 @@ Program initProgram() {
 		参数5，指定步长stride，说明连续的顶点属性组之间的间隔，简单说就是整个属性第二次出现的地方到整个数组0位置之间有多少字节
 		参数6，表示位置数据在缓冲中起始位置的偏移量
 	*/
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	// 以顶点属性位置值作为参数，启用顶点属性
 	glEnableVertexAttribArray(0);
 
@@ -66,7 +66,7 @@ Program initProgram() {
 	glEnableVertexAttribArray(1);*/
 
 	// 纹理坐标
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
 	unsigned int lightVAO;
@@ -75,10 +75,10 @@ Program initProgram() {
 	// 只需要绑定VBO，而不需要再次设置VBO，因为上面箱子的VBO已经设置了正确的数据
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	// 设置灯的顶点属性（对于灯来说只有位置数据）
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
 
 	// 设置线框模式，参数1表示应用到所有三角形的正面和背面，参数2表示用线来绘制
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
