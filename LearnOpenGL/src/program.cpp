@@ -16,7 +16,8 @@ Program initProgram() {
 	// 关闭深度测试
 	//glDisable(GL_DEPTH_TEST);
 
-	Shader shader("..\\shader.vs", "..\\shader.fs");
+	Shader shader("..\\shader.vs", "..\\object_shader.fs");
+	Shader lightShader("..\\shader.vs", "..\\light_shader.fs");
 
 	unsigned int VAO, VBO, EBO;
 	glGenVertexArrays(1, &VAO);
@@ -40,9 +41,11 @@ Program initProgram() {
 	*/
 	glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
 
+	
+
 	// 绑定EBO
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, GL_STATIC_DRAW);
 
 	/*
 		设置顶点属性指针
@@ -66,19 +69,30 @@ Program initProgram() {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	unsigned int lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+	// 只需要绑定VBO，而不需要再次设置VBO，因为上面箱子的VBO已经设置了正确的数据
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// 设置灯的顶点属性（对于灯来说只有位置数据）
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
 	// 设置线框模式，参数1表示应用到所有三角形的正面和背面，参数2表示用线来绘制
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// 设置回默认模式
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	unsigned int tex0 = createTexture("..\\container.jpg", GL_RGB);
-	unsigned int tex1 = createTexture("..\\awesomeface.png", GL_RGBA, true);
+	//unsigned int tex0 = createTexture("..\\container.jpg", GL_RGB);
+	//unsigned int tex1 = createTexture("..\\awesomeface.png", GL_RGBA, true);
 
-	shader.use();
-	// glUniform1i给纹理采样器分配一个位置值
-	glUniform1i(glGetUniformLocation(shader.ID, "texture1"), 0);
-	shader.setInt("texture2", 1);
+	//shader.use();
+	//// glUniform1i给纹理采样器分配一个位置值
+	//glUniform1i(glGetUniformLocation(shader.ID, "texture1"), 0);
+	//shader.setInt("texture2", 1);
 
 	// 解绑VBO，允许，因为glVertexAttribPointer已经将VBO注册为顶点属性绑定的VBO
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -92,11 +106,13 @@ Program initProgram() {
 	Program program;
 
 	program.VAO = VAO;
+	program.LightVAO = lightVAO;
 	program.VBO = VBO;
 	program.EBO = EBO;
 	program.ID = shader.ID;
-	program.tex0 = tex0;
-	program.tex1 = tex1;
+	program.LightID = lightShader.ID;
+	//program.tex0 = tex0;
+	//program.tex1 = tex1;
 
 	return program;
 }

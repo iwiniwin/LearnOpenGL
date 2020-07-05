@@ -11,6 +11,8 @@ public:
 	unsigned int tex0;
 	unsigned int tex1;
 	unsigned int ID;
+	unsigned int LightID;
+	unsigned int LightVAO;
 	
 	void destory() {
 		glDeleteVertexArrays(1, &VAO);
@@ -18,6 +20,7 @@ public:
 		glDeleteBuffers(1, &EBO);
 
 		glDeleteProgram(ID);
+		glDeleteProgram(LightID);
 	}
 
 private:

@@ -29,28 +29,35 @@ void update(GLFWwindow* window, float deltaTime) {
 	// 清除颜色缓冲和深度缓冲
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// 激活纹理单元
-	glActiveTexture(GL_TEXTURE0);
-	// 绑定这个纹理到当前激活的纹理单元
-	glBindTexture(GL_TEXTURE_2D, program.tex0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, program.tex1);
+	//// 激活纹理单元
+	//glActiveTexture(GL_TEXTURE0);
+	//// 绑定这个纹理到当前激活的纹理单元
+	//glBindTexture(GL_TEXTURE_2D, program.tex0);
+	//glActiveTexture(GL_TEXTURE1);
+	//glBindTexture(GL_TEXTURE_2D, program.tex1);
 
 	// 激活这个程序对象，激活后，每个着色器调用和渲染调用都会使用这个程序对象
 	glUseProgram(program.ID);
+
+	glUniform3f(glGetUniformLocation(program.ID, "objectColor"), 1.0f, 0.5f, 0.31f);
+	glUniform3f(glGetUniformLocation(program.ID, "lightColor"), 1.0f, 1.0f, 1.0f);
+
+	glm::mat4 model = glm::mat4(1.0f);
+	/*
+		参数1，uniform的位置值
+		参数2，将要发送的矩阵的个数
+		参数3，是否对矩阵进行置换（交换行和列）
+		参数4，真正的矩阵数据
+	*/
+	glUniformMatrix4fv(glGetUniformLocation(program.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
 	glm::mat4 view;
 	// 参数1，相机位置，参数2，目标位置，参数3，向上的向量
 	// cameraPos + cameraFront 保证无论摄像机位置是多少，摄像机一直是指向前方的
 	view = camera.GetViewMatrix();
+	unsigned int viewLoc = glGetUniformLocation(program.ID, "view");
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-	// 模型矩阵
-	//glm::mat4 model;
-	////model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-	// 观察矩阵
-	//glm::mat4 view;
-	//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -4.0f));
 	// 投影矩阵
 	glm::mat4 projection;
 	/*
@@ -61,58 +68,20 @@ void update(GLFWwindow* window, float deltaTime) {
 		参数4，设置了远平面距离摄像机的距离穿透
 	*/
 	projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-
-	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  0.0f),
-		glm::vec3(2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
-
-	//unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
-	/*
-		参数1，uniform的位置值
-		参数2，将要发送的矩阵的个数
-		参数3，是否对矩阵进行置换（交换行和列）
-		参数4，真正的矩阵数据
-	*/
-	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	unsigned int viewLoc = glGetUniformLocation(program.ID, "view");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
 	unsigned int projectionLoc = glGetUniformLocation(program.ID, "projection");
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 
 	
 	glBindVertexArray(program.VAO);
-
-
 	/*
 		绘制函数
 		参数1，指明打算绘制的OpenGL图元的类型
 		参数2，指定了顶点数组的起始索引
 		参数3，指定打算绘制多少个顶点
 	*/
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
-
-	for (unsigned int i = 0; i < 10; i++) {
-		glm::mat4 model;
-		model = glm::translate(model, cubePositions[i]);
-		float angle = 20.0f * i;
-		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-		unsigned int modelLoc = glGetUniformLocation(program.ID, "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-	}
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	
 
 	/*
 		指明从索引缓冲渲染，该函数从当前绑定到的GL_ELEMENT_ARRAY_BUFFER目标的EBO中获取索引
@@ -122,6 +91,18 @@ void update(GLFWwindow* window, float deltaTime) {
 		参数4，指定EBO中的偏移量
 	*/
 	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+	glUseProgram(program.LightID);
+	// 灯的位置
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	glm::mat4 lightModel = glm::mat4(1.0f);
+	lightModel = glm::translate(lightModel, lightPos);
+	lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glBindVertexArray(program.LightVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void onDestroy() {
