@@ -39,14 +39,27 @@ void update(GLFWwindow* window, float deltaTime) {
 	// 灯的位置
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
+	glm::vec3 lightColor(1.0f);
+	//lightColor.x = sin(glfwGetTime() * 2.0f);
+	//lightColor.y = sin(glfwGetTime() * 0.7f);
+	//lightColor.z = sin(glfwGetTime() * 1.3f);
+
 	// 激活这个程序对象，激活后，每个着色器调用和渲染调用都会使用这个程序对象
 	glUseProgram(program.ID);
 	glUniform3fv(glGetUniformLocation(program.ID, "viewPos"), 1, &camera.Position[0]);
-	glUniform3fv(glGetUniformLocation(program.ID, "lightPos"), 1, &lightPos[0]);
-	glUniform3f(glGetUniformLocation(program.ID, "objectColor"), 1.0f, 0.5f, 0.31f);
-	glUniform3f(glGetUniformLocation(program.ID, "lightColor"), 1.0f, 1.0f, 1.0f);
+	
+	glUniform3f(glGetUniformLocation(program.ID, "material.ambient"), 1.0f, 0.5f, 0.31f);
+	glUniform3f(glGetUniformLocation(program.ID, "material.diffuse"), 1.0f, 0.5f, 0.31f);
+	glUniform3f(glGetUniformLocation(program.ID, "material.specular"), 0.5f, 0.5f, 0.5f);
+	glUniform1f(glGetUniformLocation(program.ID, "material.shininess"), 32);
+
+	glUniform3fv(glGetUniformLocation(program.ID, "light.position"), 1, &lightPos[0]);
+	glUniform3fv(glGetUniformLocation(program.ID, "light.ambient"), 1, &(lightColor * glm::vec3(0.5f))[0]);
+	glUniform3fv(glGetUniformLocation(program.ID, "light.diffuse"), 1, &(lightColor * glm::vec3(0.2f))[0]);
+	glUniform3f(glGetUniformLocation(program.ID, "light.specular"), 1.0f, 1.0f, 1.0f);
 
 	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 1.0f));
 	/*
 		参数1，uniform的位置值
 		参数2，将要发送的矩阵的个数
@@ -99,7 +112,7 @@ void update(GLFWwindow* window, float deltaTime) {
 	glUseProgram(program.LightID);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPos);
-	lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+	lightModel = glm::scale(lightModel, glm::vec3(0.05f));
 	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
 	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
