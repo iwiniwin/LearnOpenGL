@@ -37,7 +37,7 @@ void update(GLFWwindow* window, float deltaTime) {
 	//glBindTexture(GL_TEXTURE_2D, program.tex1);
 	
 	// µÆµÄÎ»ÖÃ
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	glm::vec3 lightPos(1.0f, 0.4f, 1.0f);
 
 	glm::vec3 lightColor(1.0f);
 	//lightColor.x = sin(glfwGetTime() * 2.0f);
@@ -111,7 +111,7 @@ void update(GLFWwindow* window, float deltaTime) {
 	glUseProgram(program.LightID);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPos);
-	lightModel = glm::scale(lightModel, glm::vec3(0.05f));
+	lightModel = glm::scale(lightModel, glm::vec3(0.04f));
 	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
 	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
