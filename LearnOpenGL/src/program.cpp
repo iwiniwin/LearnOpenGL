@@ -70,12 +70,12 @@ Program initProgram() {
 	glEnableVertexAttribArray(2);
 
 	unsigned int tex0 = loadTexture("..\\container2.png");
-	//unsigned int tex1 = createTexture("..\\awesomeface.png", GL_RGBA, true);
+	unsigned int tex1 = loadTexture("..\\container2_specular.png");
 
 	shader.use();
 	//// glUniform1i给纹理采样器分配一个位置值
 	glUniform1i(glGetUniformLocation(shader.ID, "material.diffuse"), 0);
-	//shader.setInt("texture2", 1);
+	shader.setInt("material.specular", 1);
 
 	unsigned int lightVAO;
 	glGenVertexArrays(1, &lightVAO);
@@ -112,7 +112,7 @@ Program initProgram() {
 	program.ID = shader.ID;
 	program.LightID = lightShader.ID;
 	program.tex0 = tex0;
-	//program.tex1 = tex1;
+	program.tex1 = tex1;
 
 	return program;
 }

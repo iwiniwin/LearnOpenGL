@@ -33,8 +33,8 @@ void update(GLFWwindow* window, float deltaTime) {
 	glActiveTexture(GL_TEXTURE0);
 	// 绑定这个纹理到当前激活的纹理单元
 	glBindTexture(GL_TEXTURE_2D, program.tex0);
-	//glActiveTexture(GL_TEXTURE1);
-	//glBindTexture(GL_TEXTURE_2D, program.tex1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, program.tex1);
 	
 	// 灯的位置
 	glm::vec3 lightPos(1.0f, 0.4f, 1.0f);
