@@ -29,13 +29,13 @@ void update(GLFWwindow* window, float deltaTime) {
 	// 清除颜色缓冲和深度缓冲
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//// 激活纹理单元
-	//glActiveTexture(GL_TEXTURE0);
-	//// 绑定这个纹理到当前激活的纹理单元
-	//glBindTexture(GL_TEXTURE_2D, program.tex0);
+	// 激活纹理单元
+	glActiveTexture(GL_TEXTURE0);
+	// 绑定这个纹理到当前激活的纹理单元
+	glBindTexture(GL_TEXTURE_2D, program.tex0);
 	//glActiveTexture(GL_TEXTURE1);
 	//glBindTexture(GL_TEXTURE_2D, program.tex1);
-
+	
 	// 灯的位置
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
@@ -48,14 +48,13 @@ void update(GLFWwindow* window, float deltaTime) {
 	glUseProgram(program.ID);
 	glUniform3fv(glGetUniformLocation(program.ID, "viewPos"), 1, &camera.Position[0]);
 	
-	glUniform3f(glGetUniformLocation(program.ID, "material.ambient"), 1.0f, 0.5f, 0.31f);
-	glUniform3f(glGetUniformLocation(program.ID, "material.diffuse"), 1.0f, 0.5f, 0.31f);
 	glUniform3f(glGetUniformLocation(program.ID, "material.specular"), 0.5f, 0.5f, 0.5f);
-	glUniform1f(glGetUniformLocation(program.ID, "material.shininess"), 32);
+	glUniform1f(glGetUniformLocation(program.ID, "material.shininess"), 64.0f);
 
 	glUniform3fv(glGetUniformLocation(program.ID, "light.position"), 1, &lightPos[0]);
-	glUniform3fv(glGetUniformLocation(program.ID, "light.ambient"), 1, &(lightColor * glm::vec3(0.5f))[0]);
-	glUniform3fv(glGetUniformLocation(program.ID, "light.diffuse"), 1, &(lightColor * glm::vec3(0.2f))[0]);
+	glUniform3fv(glGetUniformLocation(program.ID, "light.ambient"), 1, &(lightColor * glm::vec3(0.2f))[0]);
+	glUniform3fv(glGetUniformLocation(program.ID, "light.diffuse"), 1, &(lightColor * glm::vec3(0.5f))[0]);
+
 	glUniform3f(glGetUniformLocation(program.ID, "light.specular"), 1.0f, 1.0f, 1.0f);
 
 	glm::mat4 model = glm::mat4(1.0f);

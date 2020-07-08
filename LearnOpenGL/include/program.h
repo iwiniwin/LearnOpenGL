@@ -28,4 +28,5 @@ private:
 };
 
 unsigned int createTexture(const char* fileName, unsigned int format, bool reverse = false);
+unsigned int loadTexture(const char* path);
 Program initProgram();

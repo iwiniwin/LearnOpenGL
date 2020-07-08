@@ -2,13 +2,15 @@
 
 in vec3 Normal;
 in vec3 WorldPos;
+in vec2 TexCoords;
 
 out vec4 FragColor;
 
 // 材质
 struct Material {
-	vec3 ambient;
-	vec3 diffuse;
+	// vec3 ambient;
+	// vec3 diffuse;  // 环境光颜色在几乎所有情况下都等于漫反射颜色
+	sampler2D diffuse;  // 漫反射贴图
 	vec3 specular;
 	float shininess;
 };
@@ -26,11 +28,11 @@ uniform Light light;
 uniform vec3 viewPos;
 
 void main(){
-	vec3 ambient = material.ambient * light.ambient;
+	vec3 ambient = texture(material.diffuse, TexCoords).rgb * light.ambient;
 
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(light.position - WorldPos);
-	vec3 diffuse = max(0, dot(lightDir, norm)) * light.diffuse * material.diffuse;
+	vec3 diffuse = max(0, dot(lightDir, norm)) * light.diffuse * vec3(texture(material.diffuse, TexCoords));
 
 	vec3 viewDir = normalize(viewPos - WorldPos);
 	// reflect函数要求第一个向量是从光源方向指向片段位置的，所以这里取反
