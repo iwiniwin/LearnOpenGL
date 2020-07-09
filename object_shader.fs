@@ -19,6 +19,9 @@ struct Material {
 // 光的属性
 struct Light {
 	vec3 position;
+	vec3 direction;  // 聚光方向
+	float cutoff;  // 内切光角
+	float outercutoff;  // 外切光角
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
@@ -29,10 +32,15 @@ uniform Light light;
 uniform vec3 viewPos;
 
 void main(){
+
 	vec3 ambient = texture(material.diffuse, TexCoords).rgb * light.ambient;
 
 	vec3 norm = normalize(Normal);
 	vec3 lightDir = normalize(light.position - WorldPos);
+
+	float theta = dot(lightDir, normalize(-light.direction));
+	float intensity = clamp((theta - light.outercutoff) / (light.cutoff - light.outercutoff), 0.0, 1.0);
+
 	vec3 diffuse = max(0, dot(lightDir, norm)) * light.diffuse * vec3(texture(material.diffuse, TexCoords));
 
 	vec3 viewDir = normalize(viewPos - WorldPos);
@@ -41,5 +49,7 @@ void main(){
 	// 32是高光的反光度，一个物体的反光度越大，反射光的能力越强，高光点会越小
 	vec3 specular = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess) * texture(material.specular, TexCoords).rgb * light.specular;
 
-	FragColor = vec4((ambient + diffuse + specular), 1.0f);  // 将四个分量都设置成1.0
+	FragColor = vec4((ambient + diffuse * intensity + specular * intensity), 1.0f);  // 将四个分量都设置成1.0
+
+	
 }

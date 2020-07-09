@@ -25,7 +25,7 @@ void update(GLFWwindow* window, float deltaTime) {
 	// 处理输入
 	processInput(window, deltaTime);
 
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	// 清除颜色缓冲和深度缓冲
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -38,6 +38,8 @@ void update(GLFWwindow* window, float deltaTime) {
 	
 	// 灯的位置
 	glm::vec3 lightPos(1.0f, 0.4f, 1.0f);
+	// 光源方向
+	glm::vec3 lightDirection(-0.2f, -1.0f, -0.3f);
 
 	glm::vec3 lightColor(1.0f);
 	//lightColor.x = sin(glfwGetTime() * 2.0f);
@@ -51,21 +53,30 @@ void update(GLFWwindow* window, float deltaTime) {
 	glUniform3f(glGetUniformLocation(program.ID, "material.specular"), 0.5f, 0.5f, 0.5f);
 	glUniform1f(glGetUniformLocation(program.ID, "material.shininess"), 64.0f);
 
-	glUniform3fv(glGetUniformLocation(program.ID, "light.position"), 1, &lightPos[0]);
+	//glUniform3fv(glGetUniformLocation(program.ID, "light.position"), 1, &lightPos[0]);
+	glUniform3fv(glGetUniformLocation(program.ID, "light.position"), 1, &camera.Position[0]);
+	glUniform3fv(glGetUniformLocation(program.ID, "light.direction"), 1, &camera.Front[0]);
+	glUniform1f(glGetUniformLocation(program.ID, "light.cutoff"), glm::cos(glm::radians(12.5f)));
+	glUniform1f(glGetUniformLocation(program.ID, "light.outercutoff"), glm::cos(glm::radians(17.5f)));
+
 	glUniform3fv(glGetUniformLocation(program.ID, "light.ambient"), 1, &(lightColor * glm::vec3(0.2f))[0]);
 	glUniform3fv(glGetUniformLocation(program.ID, "light.diffuse"), 1, &(lightColor * glm::vec3(0.5f))[0]);
 
+	glUniform1f(glGetUniformLocation(program.ID, "light.constant"), 1.0f);
+	glUniform1f(glGetUniformLocation(program.ID, "light.linear"), 0.09f);
+	glUniform1f(glGetUniformLocation(program.ID, "light.quadratic"), 0.032f);
+
 	glUniform3f(glGetUniformLocation(program.ID, "light.specular"), 1.0f, 1.0f, 1.0f);
 
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 1.0f));
+	//glm::mat4 model = glm::mat4(1.0f);
+	//model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 1.0f));
 	/*
 		参数1，uniform的位置值
 		参数2，将要发送的矩阵的个数
 		参数3，是否对矩阵进行置换（交换行和列）
 		参数4，真正的矩阵数据
 	*/
-	glUniformMatrix4fv(glGetUniformLocation(program.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	//glUniformMatrix4fv(glGetUniformLocation(program.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
 	glm::mat4 view;
 	// 参数1，相机位置，参数2，目标位置，参数3，向上的向量
@@ -96,7 +107,28 @@ void update(GLFWwindow* window, float deltaTime) {
 		参数2，指定了顶点数组的起始索引
 		参数3，指定打算绘制多少个顶点
 	*/
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	//glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+	for (unsigned int i = 0; i < 10; i++) {
+		glm::mat4 model;
+		model = glm::translate(model, cubePositions[i]);
+		float angle = 20.0f * i;
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		glUniformMatrix4fv(glGetUniformLocation(program.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
 	
 
 	/*
