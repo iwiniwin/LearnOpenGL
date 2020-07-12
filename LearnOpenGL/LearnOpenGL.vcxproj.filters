@@ -50,5 +50,8 @@
     <ClInclude Include="include\mesh.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
