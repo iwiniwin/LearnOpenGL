@@ -16,8 +16,8 @@ Program initProgram() {
 	// 关闭深度测试
 	//glDisable(GL_DEPTH_TEST);
 
-	Shader shader("..\\shader.vs", "..\\object_shader.fs");
-	Shader lightShader("..\\shader.vs", "..\\light_shader.fs");
+	Shader shader("shaders\\shader.vs", "shaders\\object_shader.fs");
+	Shader lightShader("shaders\\shader.vs", "shaders\\light_shader.fs");
 
 	unsigned int VAO, VBO, EBO;
 	glGenVertexArrays(1, &VAO);
@@ -69,8 +69,8 @@ Program initProgram() {
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	unsigned int tex0 = loadTexture("..\\container2.png");
-	unsigned int tex1 = loadTexture("..\\container2_specular.png");
+	unsigned int tex0 = loadTexture("textures\\container2.png");
+	unsigned int tex1 = loadTexture("textures\\container2_specular.png");
 
 	shader.use();
 	//// glUniform1i给纹理采样器分配一个位置值
