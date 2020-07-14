@@ -9,6 +9,8 @@ using namespace std;
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
 
+#include "model.h"
+
 extern const unsigned int SCR_WIDTH;
 extern const unsigned int SCR_HEIGHT;
 
@@ -16,6 +18,9 @@ extern const unsigned int SCR_HEIGHT;
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 Program program;
+
+static Model* model;
+Shader* shader;
 
 void processInput(GLFWwindow* window, float deltaTime);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -28,6 +33,19 @@ void update(GLFWwindow* window, float deltaTime) {
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	// 清除颜色缓冲和深度缓冲
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	shader->use();
+	glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	glm::mat4 viewMatrix = camera.GetViewMatrix();
+	shader->setMat4("projection", projectionMatrix);
+	shader->setMat4("view", viewMatrix);
+
+	glm::mat4 modelMatrix = glm::mat4(1.0f);
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
+	modelMatrix = glm::scale(modelMatrix, glm::vec3(1.0f, 1.0f, 1.0f));
+	shader->setMat4("model", modelMatrix);
+	cout << model->meshes.size() << endl;
+	model->draw(*shader);
+	return;
 
 	// 激活纹理单元
 	glActiveTexture(GL_TEXTURE0);
@@ -198,7 +216,16 @@ void update(GLFWwindow* window, float deltaTime) {
 }
 
 void onDestroy() {
-	program.destory();
+}
+
+void LoadModel() {
+	glEnable(GL_DEPTH_TEST);
+	Model m("nanosuit\\nanosuit.obj");
+	cout << m.meshes.size() << endl;
+	model = &m;
+	cout << model->meshes.size() << endl;
+	Shader s("shaders\\shader.vs", "shaders\\model_shader.fs");
+	shader = &s;
 }
 
 int main() {
@@ -210,7 +237,7 @@ int main() {
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 
-	program = initProgram();
+	LoadModel();
 
 	render_loop(window, update, onDestroy);
 

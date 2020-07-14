@@ -16,6 +16,7 @@ struct Vertex {
 struct Texture {
 	unsigned int id;  // 纹理ID
 	string type;  // 纹理类型，是漫反射贴图或镜面光贴图
+	string path;  // 存储纹理的路径，用于和其他纹理比较
 };
 
 class Mesh {
@@ -33,8 +34,7 @@ public:
 		setupMesh();
 	}
 
-	void Draw(Shader shader) {
-
+	void draw(Shader shader) {
 		// 绑定相应的纹理
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
