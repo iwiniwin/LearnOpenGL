@@ -40,12 +40,52 @@ void update(GLFWwindow* window, float deltaTime) {
 	sp_shader->setMat4("projection", projectionMatrix);
 	sp_shader->setMat4("view", viewMatrix);
 
+	// 点光源
+	glm::vec3 pointLightPos[] = {
+		glm::vec3(0.7f,  2.0f,  1.0f),
+		glm::vec3(0.0f, 2.6f, -0.8f),
+	};
+
+	glUniform1f(glGetUniformLocation(sp_shader->ID, "material.shininess"), 64.0f);
+	glUniform3fv(glGetUniformLocation(sp_shader->ID, "pointLights[0].position"), 1, &pointLightPos[0][0]);
+	glUniform1f(glGetUniformLocation(sp_shader->ID, "pointLights[0].constant"), 1.0f);
+	glUniform1f(glGetUniformLocation(sp_shader->ID, "pointLights[0].linear"), 0.09f);
+	glUniform1f(glGetUniformLocation(sp_shader->ID, "pointLights[0].quadratic"), 0.032f);
+	glUniform3fv(glGetUniformLocation(sp_shader->ID, "pointLights[0].ambient"), 1, &(glm::vec3(0.5f))[0]);
+	glUniform3fv(glGetUniformLocation(sp_shader->ID, "pointLights[0].diffuse"), 1, &(glm::vec3(0.8f))[0]);
+	glUniform3f(glGetUniformLocation(sp_shader->ID, "pointLights[0].specular"), 1.0f, 1.0f, 1.0f);
+
+	glUniform3fv(glGetUniformLocation(sp_shader->ID, "pointLights[1].position"), 1, &pointLightPos[1][0]);
+	glUniform1f(glGetUniformLocation(sp_shader->ID, "pointLights[1].constant"), 1.0f);
+	glUniform1f(glGetUniformLocation(sp_shader->ID, "pointLights[1].linear"), 0.09f);
+	glUniform1f(glGetUniformLocation(sp_shader->ID, "pointLights[1].quadratic"), 0.032f);
+	glUniform3fv(glGetUniformLocation(sp_shader->ID, "pointLights[1].ambient"), 1, &(glm::vec3(0.5f))[0]);
+	glUniform3fv(glGetUniformLocation(sp_shader->ID, "pointLights[1].diffuse"), 1, &(glm::vec3(0.8f))[0]);
+	glUniform3f(glGetUniformLocation(sp_shader->ID, "pointLights[1].specular"), 1.0f, 1.0f, 1.0f);
+
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
 	modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, -1.0f, 0.0f));
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(0.3f, 0.3f, 0.3f));
 	sp_shader->setMat4("model", modelMatrix);
 	//cout << sp_model->meshes.size() << endl;
 	sp_model->draw(*sp_shader);
+
+
+	
+	glUseProgram(program.LightID);
+	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "view"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(program.LightID, "projection"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	glBindVertexArray(program.LightVAO);
+	for (int i = 0; i < 2; i++) {
+		glm::mat4 lightModel = glm::mat4(1.0f);
+		lightModel = glm::translate(lightModel, pointLightPos[i]);
+		lightModel = glm::scale(lightModel, glm::vec3(0.04f));
+		glUniformMatrix4fv(glGetUniformLocation(program.LightID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+
+
 	return;
 
 	// 激活纹理单元
@@ -233,6 +273,8 @@ int main() {
 
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	
+	program = initProgram();
 
 	LoadModel();
 
