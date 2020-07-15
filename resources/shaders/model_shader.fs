@@ -58,5 +58,5 @@ void main(){
 	
 	// vec3 diffuse = max(0, dot(lightDir, norm)) * light.diffuse * texture(material.texture_diffuse1, TexCoords).rgb;
 	// FragColor = vec4(diffuse, 1.0f);
-	FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    FragColor = vec4(texture(material.texture_diffuse1, TexCoords).rgb, 1.0f);
 }
