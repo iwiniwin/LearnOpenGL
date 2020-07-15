@@ -38,6 +38,8 @@ public:
 		// 绑定相应的纹理
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
+		unsigned int normalNr = 1;
+		unsigned int heightNr = 1;
 		for (unsigned int i = 0; i < textures.size(); i++) {
 			glActiveTexture(GL_TEXTURE0 + i);
 			string number;
@@ -46,6 +48,10 @@ public:
 				number = to_string(diffuseNr++);
 			else if (name == "texture_specular")
 				number = to_string(specularNr++);
+			else if (name == "texture_normal")
+				number = to_string(normalNr++);
+			else if (name == "texture_height")
+				number = to_string(heightNr++);
 			shader.setInt(("material." + name + number).c_str(), i);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
 		}
