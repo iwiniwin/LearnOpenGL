@@ -101,7 +101,7 @@ Program initProgram() {
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	// Ω‚∞ÛVAO
-	//glBindVertexArray(0);
+	glBindVertexArray(0);
 
 	Program program;
 

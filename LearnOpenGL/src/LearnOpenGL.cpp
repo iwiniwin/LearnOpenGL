@@ -42,10 +42,11 @@ void update(GLFWwindow* window, float deltaTime) {
 
 	// µã¹âÔ´
 	glm::vec3 pointLightPos[] = {
-		glm::vec3(0.7f,  2.0f,  1.0f),
+		glm::vec3(0.0f,  2.4f,  0.8f),
 		glm::vec3(0.0f, 2.6f, -0.8f),
 	};
 
+	glUniform3fv(glGetUniformLocation(sp_shader->ID, "viewPos"), 1, &camera.Position[0]);
 	glUniform1f(glGetUniformLocation(sp_shader->ID, "material.shininess"), 64.0f);
 	glUniform3fv(glGetUniformLocation(sp_shader->ID, "pointLights[0].position"), 1, &pointLightPos[0][0]);
 	glUniform1f(glGetUniformLocation(sp_shader->ID, "pointLights[0].constant"), 1.0f);
