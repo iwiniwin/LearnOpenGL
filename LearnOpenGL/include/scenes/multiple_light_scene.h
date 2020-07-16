@@ -7,25 +7,39 @@ extern unsigned int indices[];
 extern int verticesSize;
 extern int indicesSize;
 
-class MultipleLightScene : Scene {
+class MultipleLightScene : public Scene {
 
 public:
-	void init(GLFWwindow* window, float width, float height) {
+	Camera camera;
+	Shader* objectShader;
+	Shader* lightShader;
+	//Shader test;  // 打开后，就无法使用默认的构造函数，why
+	unsigned int objectVAO;
+	unsigned int lightVAO;
+	unsigned int tex0;
+	unsigned int tex1;
+	float width;
+	float height;
+	virtual Camera* getCamera() { return &camera; }
+	virtual void init(GLFWwindow* window, float width, float height) {
 		// 开启深度测试
 		glEnable(GL_DEPTH_TEST);
 		// 关闭深度测试
 		//glDisable(GL_DEPTH_TEST);
 
-		Shader shader("shaders\\shader.vs", "shaders\\object_shader.fs");
-		Shader lightShader("shaders\\shader.vs", "shaders\\light_shader.fs");
+		objectShader = new Shader("shaders\\shader.vs", "shaders\\object_shader.fs");
+		lightShader = new Shader("shaders\\shader.vs", "shaders\\light_shader.fs");
+		camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+		this->width = width;
+		this->height = height;
 
-		unsigned int VAO, VBO, EBO;
-		glGenVertexArrays(1, &VAO);
+		unsigned int VBO, EBO;
+		glGenVertexArrays(1, &objectVAO);
 		glGenBuffers(1, &VBO);
 		glGenBuffers(1, &EBO);
 
 		// 绑定VAO
-		glBindVertexArray(VAO);
+		glBindVertexArray(objectVAO);
 
 		// 绑定VBO，顶点缓冲对象的类型是GL_ARRAY_BUFFER，将新创建的缓冲绑定到GL_ARRAY_BUFFER目标上
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -40,8 +54,6 @@ public:
 				GL_STREAM_DRAW : 数据每次绘制时都会改变
 		*/
 		glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
-
-
 
 		// 绑定EBO
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -69,15 +81,14 @@ public:
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 		glEnableVertexAttribArray(2);
 
-		unsigned int tex0 = loadTextureFromFile("textures\\container2.png");
-		unsigned int tex1 = loadTextureFromFile("textures\\container2_specular.png");
+		tex0 = loadTextureFromFile("textures\\container2.png");
+		tex1 = loadTextureFromFile("textures\\container2_specular.png");
 
-		shader.use();
-		//// glUniform1i给纹理采样器分配一个位置值
-		glUniform1i(glGetUniformLocation(shader.ID, "material.diffuse"), 0);
-		shader.setInt("material.specular", 1);
+		objectShader->use();
+		// 给纹理采样器分配一个位置值
+		objectShader->setInt("material.diffuse", 0);
+		objectShader->setInt("material.specular", 1);
 
-		unsigned int lightVAO;
 		glGenVertexArrays(1, &lightVAO);
 		glBindVertexArray(lightVAO);
 		// 只需要绑定VBO，而不需要再次设置VBO，因为上面箱子的VBO已经设置了正确的数据
@@ -85,8 +96,6 @@ public:
 		// 设置灯的顶点属性（对于灯来说只有位置数据）
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
-		//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-		//glEnableVertexAttribArray(1);
 
 		// 设置线框模式，参数1表示应用到所有三角形的正面和背面，参数2表示用线来绘制
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -102,21 +111,8 @@ public:
 
 		// 解绑VAO
 		glBindVertexArray(0);
-
-		Program program;
-
-		program.VAO = VAO;
-		program.LightVAO = lightVAO;
-		program.VBO = VBO;
-		program.EBO = EBO;
-		program.ID = shader.ID;
-		program.LightID = lightShader.ID;
-		program.tex0 = tex0;
-		program.tex1 = tex1;
-
-		return program;
 	}
-	void update(GLFWwindow* window, float deltaTime) {
+	virtual void update(GLFWwindow* window, float deltaTime) {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		// 清除颜色缓冲和深度缓冲
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -124,9 +120,9 @@ public:
 		// 激活纹理单元
 		glActiveTexture(GL_TEXTURE0);
 		// 绑定这个纹理到当前激活的纹理单元
-		glBindTexture(GL_TEXTURE_2D, program.tex0);
+		glBindTexture(GL_TEXTURE_2D, tex0);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, program.tex1);
+		glBindTexture(GL_TEXTURE_2D, tex1);
 
 		// 灯的位置
 		glm::vec3 lightPos(1.0f, 0.4f, 1.0f);
@@ -139,17 +135,17 @@ public:
 		//lightColor.z = sin(glfwGetTime() * 1.3f);
 
 		// 激活这个程序对象，激活后，每个着色器调用和渲染调用都会使用这个程序对象
-		glUseProgram(program.ID);
-		glUniform3fv(glGetUniformLocation(program.ID, "viewPos"), 1, &camera.Position[0]);
+		objectShader->use();
+		objectShader->setVec3("viewPos", camera.Position);
 
-		glUniform3f(glGetUniformLocation(program.ID, "material.specular"), 0.5f, 0.5f, 0.5f);
-		glUniform1f(glGetUniformLocation(program.ID, "material.shininess"), 64.0f);
+		objectShader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+		objectShader->setFloat("material.shininess", 64.0f);
 
 		// 平行光
-		glUniform3fv(glGetUniformLocation(program.ID, "dirLight.direction"), 1, &lightDirection[0]);
-		glUniform3fv(glGetUniformLocation(program.ID, "dirLight.ambient"), 1, &(lightColor * glm::vec3(0.5f))[0]);
-		glUniform3fv(glGetUniformLocation(program.ID, "dirLight.diffuse"), 1, &(lightColor * glm::vec3(0.4f))[0]);
-		glUniform3f(glGetUniformLocation(program.ID, "dirLight.specular"), 1.0f, 1.0f, 1.0f);
+		objectShader->setVec3("dirLight.direction", lightDirection);
+		objectShader->setVec3("dirLight.ambient", lightColor * glm::vec3(0.5f));
+		objectShader->setVec3("dirLight.diffuse", lightColor * glm::vec3(0.4f));
+		objectShader->setVec3("dirLight.specular", 1.0f, 1.0f, 1.0f);
 
 		// 点光源
 		glm::vec3 pointLightPositions[] = {
@@ -158,51 +154,49 @@ public:
 			glm::vec3(-4.0f,  2.0f, -12.0f),
 			glm::vec3(0.0f,  0.0f, -3.0f)
 		};
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[0].position"), 1, &pointLightPositions[0][0]);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[0].constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[0].linear"), 0.09f);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[0].quadratic"), 0.032f);
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[0].ambient"), 1, &(lightColor * glm::vec3(0.5f))[0]);
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[0].diffuse"), 1, &(lightColor * glm::vec3(0.8f))[0]);
-		glUniform3f(glGetUniformLocation(program.ID, "pointLights[0].specular"), 1.0f, 1.0f, 1.0f);
+		objectShader->setVec3("pointLights[0].position", pointLightPositions[0]);
+		objectShader->setFloat("pointLights[0].constant", 1.0f);
+		objectShader->setFloat("pointLights[0].linear", 0.09f);
+		objectShader->setFloat("pointLights[0].quadratic", 0.032f);
+		objectShader->setVec3("pointLights[0].ambient", lightColor * glm::vec3(0.5f));
+		objectShader->setVec3("pointLights[0].diffuse", lightColor * glm::vec3(0.8f));
+		objectShader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
 
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[1].position"), 1, &pointLightPositions[1][0]);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[1].constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[1].linear"), 0.09f);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[1].quadratic"), 0.032f);
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[1].ambient"), 1, &(lightColor * glm::vec3(0.5f))[0]);
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[1].diffuse"), 1, &(lightColor * glm::vec3(0.8f))[0]);
-		glUniform3f(glGetUniformLocation(program.ID, "pointLights[1].specular"), 1.0f, 1.0f, 1.0f);
+		objectShader->setVec3("pointLights[1].position", pointLightPositions[1]);
+		objectShader->setFloat("pointLights[1].constant", 1.0f);
+		objectShader->setFloat("pointLights[1].linear", 0.09f);
+		objectShader->setFloat("pointLights[1].quadratic", 0.032f);
+		objectShader->setVec3("pointLights[1].ambient", lightColor * glm::vec3(0.5f));
+		objectShader->setVec3("pointLights[1].diffuse", lightColor * glm::vec3(0.8f));
+		objectShader->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
 
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[2].position"), 1, &pointLightPositions[2][0]);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[2].constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[2].linear"), 0.09f);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[2].quadratic"), 0.032f);
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[2].ambient"), 1, &(lightColor * glm::vec3(0.5f))[0]);
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[2].diffuse"), 1, &(lightColor * glm::vec3(0.8f))[0]);
-		glUniform3f(glGetUniformLocation(program.ID, "pointLights[2].specular"), 1.0f, 1.0f, 1.0f);
+		objectShader->setVec3("pointLights[2].position", pointLightPositions[2]);
+		objectShader->setFloat("pointLights[2].constant", 1.0f);
+		objectShader->setFloat("pointLights[2].linear", 0.09f);
+		objectShader->setFloat("pointLights[2].quadratic", 0.032f);
+		objectShader->setVec3("pointLights[2].ambient", lightColor * glm::vec3(0.5f));
+		objectShader->setVec3("pointLights[2].diffuse", lightColor * glm::vec3(0.8f));
+		objectShader->setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
 
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[3].position"), 1, &pointLightPositions[3][0]);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[3].constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[3].linear"), 0.09f);
-		glUniform1f(glGetUniformLocation(program.ID, "pointLights[3].quadratic"), 0.032f);
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[3].ambient"), 1, &(lightColor * glm::vec3(0.5f))[0]);
-		glUniform3fv(glGetUniformLocation(program.ID, "pointLights[3].diffuse"), 1, &(lightColor * glm::vec3(0.8f))[0]);
-		glUniform3f(glGetUniformLocation(program.ID, "pointLights[3].specular"), 1.0f, 1.0f, 1.0f);
+		objectShader->setVec3("pointLights[3].position", pointLightPositions[3]);
+		objectShader->setFloat("pointLights[3].constant", 1.0f);
+		objectShader->setFloat("pointLights[3].linear", 0.09f);
+		objectShader->setFloat("pointLights[3].quadratic", 0.032f);
+		objectShader->setVec3("pointLights[3].ambient", lightColor * glm::vec3(0.5f));
+		objectShader->setVec3("pointLights[3].diffuse", lightColor * glm::vec3(0.8f));
+		objectShader->setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
 
 		// 聚光
-		glUniform3fv(glGetUniformLocation(program.ID, "spotLight.position"), 1, &camera.Position[0]);
-		glUniform3fv(glGetUniformLocation(program.ID, "spotLight.direction"), 1, &camera.Front[0]);
-		glUniform1f(glGetUniformLocation(program.ID, "spotLight.cutoff"), glm::cos(glm::radians(12.5f)));
-		glUniform1f(glGetUniformLocation(program.ID, "spotLight.outercutoff"), glm::cos(glm::radians(15.0f)));
-		glUniform3fv(glGetUniformLocation(program.ID, "spotLight.ambient"), 1, &(lightColor * glm::vec3(0.0f))[0]);
-		glUniform3fv(glGetUniformLocation(program.ID, "spotLight.diffuse"), 1, &(lightColor * glm::vec3(1.0f))[0]);
-		glUniform3f(glGetUniformLocation(program.ID, "spotLight.specular"), 1.0f, 1.0f, 1.0f);
-		glUniform1f(glGetUniformLocation(program.ID, "spotLight.constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(program.ID, "spotLight.linear"), 0.09f);
-		glUniform1f(glGetUniformLocation(program.ID, "spotLight.quadratic"), 0.032f);
-
-
+		objectShader->setVec3("spotLight.position", camera.Position);
+		objectShader->setVec3("spotLight.direction", camera.Front);
+		objectShader->setFloat("spotLight.cutoff", glm::cos(glm::radians(12.5f)));
+		objectShader->setFloat("spotLight.outercutoff", glm::cos(glm::radians(15.0f)));
+		objectShader->setVec3("spotLight.ambient", lightColor * glm::vec3(0.0f));
+		objectShader->setVec3("spotLight.diffuse", lightColor * glm::vec3(1.0f));
+		objectShader->setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+		objectShader->setFloat("spotLight.constant", 1.0f);
+		objectShader->setFloat("spotLight.linear", 0.09f);
+		objectShader->setFloat("spotLight.quadratic", 0.032f);
 
 		//glm::mat4 model = glm::mat4(1.0f);
 		//model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 1.0f));
@@ -218,8 +212,7 @@ public:
 		// 参数1，相机位置，参数2，目标位置，参数3，向上的向量
 		// cameraPos + cameraFront 保证无论摄像机位置是多少，摄像机一直是指向前方的
 		view = camera.GetViewMatrix();
-		unsigned int viewLoc = glGetUniformLocation(program.ID, "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		objectShader->setMat4("view", view);
 
 		// 投影矩阵
 		glm::mat4 projection;
@@ -230,13 +223,10 @@ public:
 			参数3，设置了近平面距离摄像机的距离
 			参数4，设置了远平面距离摄像机的距离穿透
 		*/
-		projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		unsigned int projectionLoc = glGetUniformLocation(program.ID, "projection");
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		projection = glm::perspective(glm::radians(camera.Zoom), this->width / this->height, 0.1f, 100.0f);
+		objectShader->setMat4("projection", projection);
 
-
-
-		glBindVertexArray(program.VAO);
+		glBindVertexArray(objectVAO);
 		/*
 			绘制函数
 			参数1，指明打算绘制的OpenGL图元的类型
@@ -262,10 +252,9 @@ public:
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			glUniformMatrix4fv(glGetUniformLocation(program.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+			objectShader->setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-
 
 		/*
 			指明从索引缓冲渲染，该函数从当前绑定到的GL_ELEMENT_ARRAY_BUFFER目标的EBO中获取索引
@@ -276,19 +265,22 @@ public:
 		*/
 		//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
-		glUseProgram(program.LightID);
-		glUniformMatrix4fv(glGetUniformLocation(program.LightID, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(program.LightID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glBindVertexArray(program.LightVAO);
+		lightShader->use();
+		lightShader->setMat4("view", view);
+		lightShader->setMat4("projection", projection);
+		glBindVertexArray(lightVAO);
 		for (int i = 0; i < 4; i++) {
 			glm::mat4 lightModel = glm::mat4(1.0f);
 			lightModel = glm::translate(lightModel, pointLightPositions[i]);
 			lightModel = glm::scale(lightModel, glm::vec3(0.04f));
-			glUniformMatrix4fv(glGetUniformLocation(program.LightID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+			lightShader->setMat4("model", lightModel);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-	}
-	void destroy() {
 
+		glBindVertexArray(0);
+	}
+	virtual void destroy() {
+		delete(this->objectShader);
+		delete(this->lightShader);
 	}
 };
