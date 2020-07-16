@@ -11,8 +11,8 @@ using namespace std;
 #include "scenes/multiple_light_scene.h"
 
 Scene* loadScene() {
-	return new MultipleLightScene;
-	//return new ModelScene;
+	//return new MultipleLightScene;
+	return new ModelScene;
 }
 
 extern const unsigned int SCR_WIDTH;

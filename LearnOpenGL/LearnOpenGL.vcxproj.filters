@@ -24,9 +24,6 @@
     <ClCompile Include="src\data.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\program.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\window.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -36,9 +33,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\window.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\program.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\camera.h">
