@@ -33,6 +33,7 @@ void update(GLFWwindow* window, float deltaTime) {
 
 void onDestroy() {
 	scene->destroy();
+	delete(scene);
 }
 
 int main() {

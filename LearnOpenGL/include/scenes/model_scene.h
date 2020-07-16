@@ -38,7 +38,7 @@ public:
 		glGenBuffers(1, &lightVBO);
 		glBindVertexArray(lightVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
+		glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
 
@@ -62,23 +62,24 @@ public:
 			glm::vec3(0.0f, 2.6f, -0.8f),
 		};
 
-		glUniform3fv(glGetUniformLocation(this->nanosuitShader->ID, "viewPos"), 1, &camera.Position[0]);
-		glUniform1f(glGetUniformLocation(this->nanosuitShader->ID, "material.shininess"), 64.0f);
-		glUniform3fv(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[0].position"), 1, &pointLightPos[0][0]);
-		glUniform1f(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[0].constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[0].linear"), 0.09f);
-		glUniform1f(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[0].quadratic"), 0.032f);
-		glUniform3fv(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[0].ambient"), 1, &(glm::vec3(0.5f))[0]);
-		glUniform3fv(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[0].diffuse"), 1, &(glm::vec3(0.8f))[0]);
-		glUniform3f(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[0].specular"), 1.0f, 1.0f, 1.0f);
+		this->nanosuitShader->setVec3("viewPos", camera.Position);
+		this->nanosuitShader->setFloat("material.shininess", 64.0f);
 
-		glUniform3fv(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[1].position"), 1, &pointLightPos[1][0]);
-		glUniform1f(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[1].constant"), 1.0f);
-		glUniform1f(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[1].linear"), 0.09f);
-		glUniform1f(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[1].quadratic"), 0.032f);
-		glUniform3fv(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[1].ambient"), 1, &(glm::vec3(0.5f))[0]);
-		glUniform3fv(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[1].diffuse"), 1, &(glm::vec3(0.8f))[0]);
-		glUniform3f(glGetUniformLocation(this->nanosuitShader->ID, "pointLights[1].specular"), 1.0f, 1.0f, 1.0f);
+		this->nanosuitShader->setVec3("pointLights[0].position", pointLightPos[0]);
+		this->nanosuitShader->setFloat("pointLights[0].constant", 1.0f);
+		this->nanosuitShader->setFloat("pointLights[0].linear", 0.09f);
+		this->nanosuitShader->setFloat("pointLights[0].quadratic", 0.032f);
+		this->nanosuitShader->setVec3("pointLights[0].ambient", glm::vec3(0.5f));
+		this->nanosuitShader->setVec3("pointLights[0].diffuse", glm::vec3(0.8f));
+		this->nanosuitShader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+
+		this->nanosuitShader->setVec3("pointLights[1].position", pointLightPos[1]);
+		this->nanosuitShader->setFloat("pointLights[1].constant", 1.0f);
+		this->nanosuitShader->setFloat("pointLights[1].linear", 0.09f);
+		this->nanosuitShader->setFloat("pointLights[1].quadratic", 0.032f);
+		this->nanosuitShader->setVec3("pointLights[1].ambient", glm::vec3(0.5f));
+		this->nanosuitShader->setVec3("pointLights[1].diffuse", glm::vec3(0.8f));
+		this->nanosuitShader->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
 
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, -1.0f, 0.0f));
@@ -87,19 +88,22 @@ public:
 		this->nanosuitModel->draw(*this->nanosuitShader);
 
 		// »æÖÆ¹âÔ´
-		//this->lightShader->use();
-		//this->lightShader->setMat4("view", viewMatrix);
-		//this->lightShader->setMat4("projection", projectionMatrix);
-		//glBindVertexArray(lightVAO);
-		//for (int i = 0; i < 2; i++) {
-		//	glm::mat4 lightModel = glm::mat4(1.0f);
-		//	lightModel = glm::translate(lightModel, pointLightPos[i]);
-		//	lightModel = glm::scale(lightModel, glm::vec3(0.04f));
-		//	this->lightShader->setMat4("model", lightModel);
-		//	glDrawArrays(GL_TRIANGLES, 0, 36);
-		//}
+		this->lightShader->use();
+		this->lightShader->setMat4("view", viewMatrix);
+		this->lightShader->setMat4("projection", projectionMatrix);
+		glBindVertexArray(lightVAO);
+		for (int i = 0; i < 2; i++) {
+			glm::mat4 lightModel = glm::mat4(1.0f);
+			lightModel = glm::translate(lightModel, pointLightPos[i]);
+			lightModel = glm::scale(lightModel, glm::vec3(0.04f));
+			this->lightShader->setMat4("model", lightModel);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		glBindVertexArray(0);
 	}
 	virtual void destroy() {
-
+		delete(this->nanosuitModel);
+		delete(this->nanosuitShader);
+		delete(this->lightShader);
 	}
 };
