@@ -129,22 +129,34 @@ float vertices[] = {
 int verticesSize = sizeof(vertices);
 
 unsigned int indices[] = {
-		0, 1, 3,
-		1, 2, 3,
+	0, 1, 3,
+	1, 2, 3,
 
-		0, 1, 5,
-		0, 4, 5,
+	0, 1, 5,
+	0, 4, 5,
 
-		4, 5, 6,
-		4, 6, 7,
+	4, 5, 6,
+	4, 6, 7,
 
-		7, 6, 3,
-		2, 6, 3,
+	7, 6, 3,
+	2, 6, 3,
 
-		0, 3, 4,
-		3, 4, 7,
+	0, 3, 4,
+	3, 4, 7,
 
-		1, 2, 5,
-		2, 5, 6,
+	1, 2, 5,
+	2, 5, 6,
 };
 int indicesSize = sizeof(indices);
+
+float planeVertices[] = {
+	// positions texture_coords
+	 5.0f, -0.51f,  5.0f,  2.0f, 0.0f,
+	-5.0f, -0.51f,  5.0f,  0.0f, 0.0f,
+	-5.0f, -0.51f, -5.0f,  0.0f, 2.0f,
+
+	5.0f, -0.51f,  5.0f,  2.0f, 0.0f,
+	-5.0f, -0.51f, -5.0f,  0.0f, 2.0f,
+	5.0f, -0.51f, -5.0f,  2.0f, 2.0f
+};
+int planeVerticesSize = sizeof(planeVertices);

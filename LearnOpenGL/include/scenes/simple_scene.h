@@ -7,11 +7,15 @@ class SimpleScene : public Scene {
 
 public:
 	Camera camera;
+	float width;
+	float height;
 
 	virtual Camera* getCamera() { return &camera; }
 
 	virtual void init(GLFWwindow* window, float width, float height) {
-		
+		this->width = width;
+		this->height = height;
+		camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 	}
 
 	virtual void update(GLFWwindow* window, float deltaTime) {
