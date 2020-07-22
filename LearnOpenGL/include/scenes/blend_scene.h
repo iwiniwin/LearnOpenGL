@@ -2,6 +2,7 @@
 #include <memory>
 #include "scene.h"
 #include "model.h"
+#include <map>
 
 extern float vertices[];
 extern int verticesSize;
@@ -21,6 +22,7 @@ public:
 	unsigned int cubeTexture;
 	unsigned int floorTexture;
 	unsigned int grassTexture;
+	unsigned int windowTexture;
 	
 	Shader* shader;
 	float width;
@@ -32,6 +34,9 @@ public:
 		glEnable(GL_DEPTH_TEST);
 		//glDepthFunc(GL_ALWAYS);
 		glDepthFunc(GL_LESS);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		this->width = width;
 		this->height = height;
@@ -81,6 +86,7 @@ public:
 		cubeTexture = loadTextureFromFile("textures\\container2.png");
 		floorTexture = loadTextureFromFile("textures\\container.jpg");
 		grassTexture = loadTextureFromFile("textures\\grass.png");
+		windowTexture = loadTextureFromFile("textures\\blending_transparent_window.png");
 
 		this->shader->use();
 		this->shader->setInt("texture1", 0);
@@ -124,14 +130,30 @@ public:
 		vegetation.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
 		vegetation.push_back(glm::vec3(0.5f, 0.0f, -0.6f));
 
-		glBindVertexArray(vegetationVAO);
-		glBindTexture(GL_TEXTURE_2D, grassTexture);
+		// 对透明物体进行排序
+		map<float, glm::vec3> sorted;
 		for (unsigned int i = 0; i < vegetation.size(); i++) {
+			float distance = glm::length(camera.Position - vegetation[i]);
+			sorted[distance] = vegetation[i];
+		}
+
+		glBindVertexArray(vegetationVAO);
+		//glBindTexture(GL_TEXTURE_2D, grassTexture);
+		glBindTexture(GL_TEXTURE_2D, windowTexture);
+
+		for (map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) {
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, it->second);
+			this->shader->setMat4("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
+		/*for (unsigned int i = 0; i < vegetation.size(); i++) {
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, vegetation[i]);
 			this->shader->setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
-		}
+		}*/
 
 		glBindVertexArray(0);
 
