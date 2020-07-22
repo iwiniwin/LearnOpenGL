@@ -10,6 +10,8 @@ extern float planeVertices[];
 extern int planeVerticesSize;
 extern float quadrangleVertices[];
 extern int quadrangleVerticesSize;
+extern float ccwVertices[];
+extern int ccwVerticesSize;
 
 class BlendScene : public Scene {
 
@@ -38,6 +40,11 @@ public:
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		glEnable(GL_CULL_FACE);
+		//glCullFace(GL_BACK);
+		glCullFace(GL_FRONT);
+		//glFrontFace(GL_CW);
+
 		this->width = width;
 		this->height = height;
 		camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -49,7 +56,8 @@ public:
 		glGenBuffers(1, &cubeVBO);
 		glBindVertexArray(cubeVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-		glBufferData(GL_ARRAY_BUFFER, verticesSize, &vertices, GL_STATIC_DRAW);
+		//glBufferData(GL_ARRAY_BUFFER, verticesSize, &vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, ccwVerticesSize, &ccwVertices, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(1);
@@ -121,6 +129,8 @@ public:
 		glBindTexture(GL_TEXTURE_2D, floorTexture);
 		this->shader->setMat4("model", glm::mat4(1.0f));
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		return;
 
 		// vegetation
 		vector<glm::vec3> vegetation;
