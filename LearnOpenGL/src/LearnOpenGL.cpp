@@ -12,13 +12,15 @@ using namespace std;
 #include "scenes/depth_scene.h"
 #include "scenes/stencil_scene.h"
 #include "scenes/blend_scene.h"
+#include "scenes/framebuffer_scene.h"
 
 Scene* loadScene() {
 	//return new MultipleLightScene;
 	//return new ModelScene;
 	//return new DepthScene;
 	//return new StencilScene;
-	return new BlendScene;
+	//return new BlendScene;
+	return new FrameBufferScene;
 }
 
 extern const unsigned int SCR_WIDTH;
