@@ -173,6 +173,17 @@ float quadrangleVertices[] = {
 };
 int quadrangleVerticesSize = sizeof(quadrangleVertices);
 
+float fullScreenQuadVertices[] = {
+	-1.0f, 1.0f, 0.0f, 1.0f,
+	-1.0f, -1.0f, 0.0f, 0.0f,
+	1.0f, -1.0f, 1.0f, 0.0f,
+
+	-1.0f, 1.0f, 0.0f, 1.0f,
+	1.0f, -1.0f, 1.0f, 0.0f,
+	1.0f, 1.0f, 1.0f, 1.0f,
+};
+int fullScreenQuadVerticesSize = sizeof(fullScreenQuadVertices);
+
 
 // 基于左手坐标系逆时针顺序定义的顶点
 // 实际上应该基于右手坐标系？
