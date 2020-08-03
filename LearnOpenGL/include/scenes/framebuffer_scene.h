@@ -52,6 +52,9 @@ public:
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		// 避免利用卷积核进行采样时，采样到纹理的另一边，导致屏幕边缘出现奇怪的条纹
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		
 		/*
@@ -85,7 +88,7 @@ public:
 
 	void initVAO() {
 		this->shader = new Shader("shaders\\shader.vs", "shaders\\depth_shader.fs");
-		this->screenShader = new Shader("shaders\\ndc_shader.vs", "shaders\\single_tex_shader.fs");
+		this->screenShader = new Shader("shaders\\ndc_shader.vs", "shaders\\convolution_kernel_shader.fs");
 
 		glGenVertexArrays(1, &cubeVAO);
 		unsigned int cubeVBO;
