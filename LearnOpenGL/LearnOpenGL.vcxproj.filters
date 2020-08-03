@@ -68,5 +68,8 @@
     <ClInclude Include="include\scenes\framebuffer_scene.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\scenes\cubemap_scene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
