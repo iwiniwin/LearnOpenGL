@@ -31,10 +31,10 @@ public:
 		camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 		
 		skyboxShader = new Shader("shaders\\cubemap_shader.vs", "shaders\\single_cubemap_shader.fs");
-		cubeShader = new Shader("shaders\\shader.vs", "shaders\\reflect_cube_shader.fs");
+		cubeShader = new Shader("shaders\\shader.vs", "shaders\\environment_mapping_shader.fs");
 
 		this->nanosuitModel = new Model("nanosuit\\nanosuit.obj");
-		this->nanosuitShader = new Shader("shaders\\shader.vs", "shaders\\reflect_cube_shader.fs");
+		this->nanosuitShader = new Shader("shaders\\shader.vs", "shaders\\environment_mapping_shader.fs");
 
 		initVAO();
 		vector<string> faces{
@@ -133,6 +133,7 @@ public:
 		this->nanosuitShader->setMat4("model", modelMatrix);
 		this->nanosuitShader->setMat4("view", glm::mat4(camera.GetViewMatrix()));
 		this->nanosuitShader->setMat4("projection", projection);
+		this->nanosuitShader->setVec3("cameraPos", camera.Position);
 		this->nanosuitModel->draw(*this->nanosuitShader);
 
 		glDepthFunc(GL_LEQUAL);
