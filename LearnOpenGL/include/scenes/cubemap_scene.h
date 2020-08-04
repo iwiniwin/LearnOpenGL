@@ -20,6 +20,8 @@ public:
 	unsigned int cubeTexture;
 	Shader* skyboxShader;
 	Shader* cubeShader;
+	Model* nanosuitModel;
+	Shader* nanosuitShader;
 
 	virtual Camera* getCamera() { return &camera; }
 
@@ -29,7 +31,10 @@ public:
 		camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 		
 		skyboxShader = new Shader("shaders\\cubemap_shader.vs", "shaders\\single_cubemap_shader.fs");
-		cubeShader = new Shader("shaders\\shader.vs", "shaders\\depth_shader.fs");
+		cubeShader = new Shader("shaders\\shader.vs", "shaders\\reflect_cube_shader.fs");
+
+		this->nanosuitModel = new Model("nanosuit\\nanosuit.obj");
+		this->nanosuitShader = new Shader("shaders\\shader.vs", "shaders\\reflect_cube_shader.fs");
 
 		initVAO();
 		vector<string> faces{
@@ -109,14 +114,26 @@ public:
 		glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), width / height, 0.1f, 100.0f);
 
-		cubeShader->use();
-		cubeShader->setMat4("model", model);
-		cubeShader->setMat4("view", glm::mat4(camera.GetViewMatrix()));
-		cubeShader->setMat4("projection", projection);
+		// 绘制立方体
+		//cubeShader->use();
+		//cubeShader->setMat4("model", model);
+		//cubeShader->setMat4("view", glm::mat4(camera.GetViewMatrix()));
+		//cubeShader->setMat4("projection", projection);
+		//cubeShader->setVec3("cameraPos", camera.Position);
+		//glBindVertexArray(cubeVAO);
+		////glBindTexture(GL_TEXTURE_2D, cubeTexture);
+		//glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		glBindVertexArray(cubeVAO);
-		glBindTexture(GL_TEXTURE_2D, cubeTexture);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		// 绘制纳米装
+		this->nanosuitShader->use();
+		glm::mat4 modelMatrix = glm::mat4(1.0f);
+		modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, -1.0f, 0.0f));
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.3f, 0.3f, 0.3f));
+		this->nanosuitShader->setMat4("model", modelMatrix);
+		this->nanosuitShader->setMat4("view", glm::mat4(camera.GetViewMatrix()));
+		this->nanosuitShader->setMat4("projection", projection);
+		this->nanosuitModel->draw(*this->nanosuitShader);
 
 		glDepthFunc(GL_LEQUAL);
 
@@ -135,5 +152,7 @@ public:
 	virtual void destroy() {
 		delete(skyboxShader);
 		delete(cubeShader);
+		delete(nanosuitShader);
+		delete(nanosuitModel);
 	}
 };
