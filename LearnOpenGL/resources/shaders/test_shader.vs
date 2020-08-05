@@ -7,6 +7,10 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+out VS_OUT{  // 块名必须和片段着色器的相同
+	vec2 TexCoords;
+} vs_out;  // 实例名不要求与片段着色器的相同
+
 out vec2 TexCoords;
 
 void main(){
@@ -15,4 +19,5 @@ void main(){
 	// gl_PointSize = gl_Position.z;
 	// gl_PointSize = 30;
 	TexCoords = aTexCoords;
+	vs_out.TexCoords = aTexCoords;
 }
