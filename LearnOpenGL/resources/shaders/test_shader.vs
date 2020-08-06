@@ -3,9 +3,12 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 
+layout (std140) uniform Matrices{  // 一个叫Matrices的Uniform块，Uniform块中的变量可以直接访问，不需要加块名作为前缀
+	mat4 projection;
+	mat4 view;
+};
+
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
 
 out VS_OUT{  // 块名必须和片段着色器的相同
 	vec2 TexCoords;

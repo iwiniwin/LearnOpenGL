@@ -92,6 +92,10 @@ public:
 		glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 	}
 
+	void setBlockBinding(const string& name, int value) {
+		glUniformBlockBinding(ID, glGetUniformBlockIndex(ID, name.c_str()), value);
+	}
+
 private:
 
 	void compileShader(const char* vShaderCode, const char* fShaderCode) {
