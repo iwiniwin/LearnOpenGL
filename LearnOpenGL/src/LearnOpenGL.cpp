@@ -15,6 +15,7 @@ using namespace std;
 #include "scenes/framebuffer_scene.h"
 #include "scenes/cubemap_scene.h"
 #include "scenes/test_scene.h"
+#include "scenes/geometry_shader_scene.h"
 
 Scene* loadScene() {
 	//return new MultipleLightScene;
@@ -24,7 +25,8 @@ Scene* loadScene() {
 	//return new BlendScene;
 	//return new FrameBufferScene;
 	//return new CubemapScene;
-	return new TestScene;
+	//return new TestScene;
+	return new GeometryShaderScene;
 }
 
 extern const unsigned int SCR_WIDTH;

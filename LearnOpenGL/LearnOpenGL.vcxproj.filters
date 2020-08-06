@@ -74,5 +74,8 @@
     <ClInclude Include="include\scenes\test_scene.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\scenes\geometry_shader_scene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

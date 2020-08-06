@@ -17,13 +17,14 @@ public:
 	unsigned int ID;
 
 	// 构造器读取并创建着色器
-	Shader(const GLchar* vertexPath, const GLchar* fragmentpath) {
+	Shader(const GLchar* vertexPath, const GLchar* fragmentpath, const GLchar* geometryPath = nullptr) {
 		// 从文件路径中获取顶点/片段着色器
-		string vertextCode, fragmentCode;
-		ifstream vShaderFile, fShaderFile;
+		string vertextCode, fragmentCode, geometryCode;
+		ifstream vShaderFile, fShaderFile, gShaderFile;
 		// 设置异常掩码，指定哪些状态标志时抛出异常
 		vShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
 		fShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
+		gShaderFile.exceptions(ifstream::failbit | ifstream::badbit);
 		try {
 			// 打开文件
 			vShaderFile.open(vertexPath);
@@ -38,11 +39,19 @@ public:
 			// 转换数据流到str
 			vertextCode = vShaderStream.str();
 			fragmentCode = fShaderStream.str();
+
+			if (geometryPath != nullptr) {
+				gShaderFile.open(geometryPath);
+				stringstream gShaderStream;
+				gShaderStream << gShaderFile.rdbuf();
+				gShaderFile.close();
+				geometryCode = gShaderStream.str();
+			}
 		}
 		catch (ifstream::failure e) {
 			cerr << "read shader file error : \n" << e.what() << endl;
 		}
-		compileShader(vertextCode.c_str(), fragmentCode.c_str());
+		compileShader(vertextCode.c_str(), fragmentCode.c_str(), geometryPath == nullptr ? nullptr : geometryCode.c_str());
 	}
 
 
@@ -98,8 +107,8 @@ public:
 
 private:
 
-	void compileShader(const char* vShaderCode, const char* fShaderCode) {
-		unsigned int vertex, fragment;
+	void compileShader(const char* vShaderCode, const char* fShaderCode, const char* gShaderCode) {
+		unsigned int vertex, fragment, geometry;
 		int success;
 		char infoLog[512];
 		vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -120,10 +129,24 @@ private:
 			cerr << "fragment shader error : \n" << infoLog << endl;
 		}
 
+		if (gShaderCode != nullptr) {
+			geometry = glCreateShader(GL_GEOMETRY_SHADER);
+			glShaderSource(geometry, 1, &gShaderCode, NULL);
+			glCompileShader(geometry);
+			glGetShaderiv(geometry, GL_COMPILE_STATUS, &success);
+			if (!success) {
+				glGetShaderInfoLog(geometry, 512, NULL, infoLog);
+				cerr << "geometry shader error : \n" << infoLog << endl;
+			}
+		}
+
 		// 创建着色器程序对象
 		ID = glCreateProgram();
 		glAttachShader(ID, vertex);
 		glAttachShader(ID, fragment);
+		if (gShaderCode != nullptr) {
+			glAttachShader(ID, geometry);
+		}
 		glLinkProgram(ID);
 		glGetProgramiv(ID, GL_LINK_STATUS, &success);
 		if (!success) {
@@ -133,6 +156,9 @@ private:
 
 		glDeleteShader(vertex);
 		glDeleteShader(fragment);
+		if (gShaderCode != nullptr) {
+			glDeleteShader(geometry);
+		}
 	}
 
 };
