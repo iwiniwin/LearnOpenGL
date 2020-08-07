@@ -13,6 +13,8 @@ public:
 	Shader* shader;
 	Model* nanosuitModel;
 	Shader* nanosuitShader;
+	Shader* nanosuitExplodeShader;
+	Shader* normalDisplayShader;
 
 	virtual Camera* getCamera() { return &camera; }
 
@@ -22,8 +24,9 @@ public:
 		camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 		shader = new Shader("shaders\\point_shader.vs", "shaders\\single_color_shader.fs", "shaders\\shader.gs");
 		this->nanosuitModel = new Model("nanosuit\\nanosuit.obj");
-		this->nanosuitShader = new Shader("shaders\\shader.vs", "shaders\\model_diffuse_shader.fs", "shaders\\explode_shader.gs");
-
+		this->nanosuitShader = new Shader("shaders\\shader.vs", "shaders\\model_diffuse_shader.fs");
+		this->nanosuitExplodeShader = new Shader("shaders\\shader.vs", "shaders\\model_diffuse_shader.fs", "shaders\\explode_shader.gs");
+		this->normalDisplayShader = new Shader("shaders\\shader.vs", "shaders\\single_color_shader.fs", "shaders\\normal_display_shader.gs");
 		initVAO();
 	}
 
@@ -62,22 +65,36 @@ public:
 		//shader->setMat4("projection", projection);
 		//glDrawArrays(GL_POINTS, 0, 4);
 
-
-		nanosuitShader->use();
 		glm::mat4 projectionMatrix = glm::perspective(glm::radians(camera.Zoom), width / height, 0.1f, 100.0f);
 		glm::mat4 viewMatrix = camera.GetViewMatrix();
-		this->nanosuitShader->setMat4("projection", projectionMatrix);
-		this->nanosuitShader->setMat4("view", viewMatrix);
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, -1.0f, 0.0f));
 		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.15f, 0.15f, 0.15f));
+
+		/*nanosuitExplodeShader->use();
+		this->nanosuitExplodeShader->setMat4("projection", projectionMatrix);
+		this->nanosuitExplodeShader->setMat4("view", viewMatrix);
+		this->nanosuitExplodeShader->setMat4("model", modelMatrix);
+		nanosuitExplodeShader->setFloat("time", glfwGetTime());
+		nanosuitModel->draw(*nanosuitExplodeShader);*/
+
+		nanosuitShader->use();
+		this->nanosuitShader->setMat4("projection", projectionMatrix);
+		this->nanosuitShader->setMat4("view", viewMatrix);
 		this->nanosuitShader->setMat4("model", modelMatrix);
-		nanosuitShader->setFloat("time", glfwGetTime());
 		nanosuitModel->draw(*nanosuitShader);
+
+		normalDisplayShader->use();
+		normalDisplayShader->setMat4("projection", projectionMatrix);
+		this->nanosuitExplodeShader->setMat4("view", viewMatrix);
+		this->nanosuitExplodeShader->setMat4("model", modelMatrix);
+		nanosuitModel->draw(*normalDisplayShader);
 	}
 	virtual void destroy() {
 		delete(shader);
 		delete(nanosuitModel);
+		delete(nanosuitExplodeShader);
+		delete(normalDisplayShader);
 		delete(nanosuitShader);
 	}
 };
