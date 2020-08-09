@@ -283,5 +283,16 @@ float skyboxVertices[] = {
 	-1.0f, -1.0f,  1.0f,
 	 1.0f, -1.0f,  1.0f
 };
-
 int skyboxVerticesSize = sizeof(skyboxVertices);
+
+float smallQuadVertices[] = {
+	// Î»ÖÃ          // ÑÕÉ«
+	-0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
+	 0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
+	-0.05f, -0.05f,  0.0f, 0.0f, 1.0f,
+
+	-0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
+	 0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
+	 0.05f,  0.05f,  0.0f, 1.0f, 1.0f
+};
+int smallQuadVerticesSize = sizeof(smallQuadVertices);
