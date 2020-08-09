@@ -37,15 +37,6 @@ public:
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(2 * sizeof(float)));
-		glBindVertexArray(0);
-	}
-
-	virtual void update(GLFWwindow* window, float deltaTime) {
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		// 清除颜色缓冲和深度缓冲
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glBindVertexArray(VAO);
 
 		glm::vec2 translations[100];
 		int index = 0;
@@ -58,15 +49,31 @@ public:
 				translations[index++] = translation;
 			}
 		}
-		shader->use();
-		for (unsigned int i = 0; i < 100; i++) {
-			stringstream ss;
-			string index;
-			ss << i;
-			index = ss.str();
-			shader->setVec2(("offsets[" + index + "]").c_str(), translations[i]);
-		}
+		unsigned int instanceVBO;
+		glGenBuffers(1, &instanceVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 100, &translations[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+		/*
+			告诉OpenGL该什么时候更新顶点属性的内容到新一组数据
+			参数1，是要设置的顶点属性的位置值
+			参数2，是属性除数，默认情况下属性除数是0，告诉OpenGL需要在顶点着色器的每次迭代更新顶点属性，
+				设置为1，是告诉OpenGL需要再渲染一个新实例时更新顶点属性，设置为2，表示每两个实例更新一次属性。以此类推
+		*/
+		glVertexAttribDivisor(2, 1);
+		glBindVertexArray(0);
+	}
 
+	virtual void update(GLFWwindow* window, float deltaTime) {
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		// 清除颜色缓冲和深度缓冲
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glBindVertexArray(VAO);
+
+		
+		shader->use();
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100);
 		glBindVertexArray(0);
 	}
