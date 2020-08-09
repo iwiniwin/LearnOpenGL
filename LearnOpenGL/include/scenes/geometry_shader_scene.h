@@ -86,8 +86,8 @@ public:
 
 		normalDisplayShader->use();
 		normalDisplayShader->setMat4("projection", projectionMatrix);
-		this->nanosuitExplodeShader->setMat4("view", viewMatrix);
-		this->nanosuitExplodeShader->setMat4("model", modelMatrix);
+		this->normalDisplayShader->setMat4("view", viewMatrix);
+		this->normalDisplayShader->setMat4("model", modelMatrix);
 		nanosuitModel->draw(*normalDisplayShader);
 	}
 	virtual void destroy() {
