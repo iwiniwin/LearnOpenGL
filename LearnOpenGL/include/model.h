@@ -10,6 +10,7 @@ class Model {
 
 public:
 	vector<Mesh> meshes;
+	vector<Texture> textures_loaded;
 	Model(string path) {
 		LoadModel(path);
 	}
@@ -23,7 +24,6 @@ private:
 
 	
 	string directory;
-	vector<Texture> textures_loaded;
 
 	void LoadModel(string path) {
 		Assimp::Importer importer;
