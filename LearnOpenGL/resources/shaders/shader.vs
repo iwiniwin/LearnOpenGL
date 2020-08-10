@@ -19,6 +19,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+out vec3 fColor;
+
 void main(){
 	// 注意 乘法要从右往左读
 	gl_Position = projection * view * model * vec4(aPos, 1.0);

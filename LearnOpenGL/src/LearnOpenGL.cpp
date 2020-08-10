@@ -17,6 +17,7 @@ using namespace std;
 #include "scenes/test_scene.h"
 #include "scenes/geometry_shader_scene.h"
 #include "scenes/instancing_scene.h"
+#include "scenes/anti_aliasing_scene.h"
 
 Scene* loadScene() {
 	//return new MultipleLightScene;
@@ -28,7 +29,8 @@ Scene* loadScene() {
 	//return new CubemapScene;
 	//return new TestScene;
 	//return new GeometryShaderScene;
-	return new InstancingScene;
+	//return new InstancingScene;
+	return new AntiAliasingScene;
 }
 
 extern const unsigned int SCR_WIDTH;

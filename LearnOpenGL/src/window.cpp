@@ -17,6 +17,8 @@ GLFWwindow* initWindow() {
 	// 告诉glfw使用OpenGL核心模式
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+	glfwWindowHint(GLFW_SAMPLES, 4);  // 使用一个包含4个样本（采样点）的多重采样缓冲
+
 	// 创建一个窗口对象，这个对象存放了所有和窗口相关的数据
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
 	if (window == NULL) {
