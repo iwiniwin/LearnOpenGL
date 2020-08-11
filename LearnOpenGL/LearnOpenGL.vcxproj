@@ -31,6 +31,7 @@
     <ClInclude Include="include\scene.h" />
     <ClInclude Include="include\scenes\anti_aliasing_scene.h" />
     <ClInclude Include="include\scenes\blend_scene.h" />
+    <ClInclude Include="include\scenes\blinn_phong_scene.h" />
     <ClInclude Include="include\scenes\cubemap_scene.h" />
     <ClInclude Include="include\scenes\depth_scene.h" />
     <ClInclude Include="include\scenes\framebuffer_scene.h" />

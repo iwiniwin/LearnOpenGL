@@ -83,5 +83,8 @@
     <ClInclude Include="include\scenes\anti_aliasing_scene.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\scenes\blinn_phong_scene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

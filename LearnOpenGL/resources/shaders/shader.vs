@@ -6,6 +6,7 @@ layout (location = 2) in vec2 aTexCoords;
 out vec3 Normal;
 out vec3 WorldPos;
 out vec2 TexCoords;
+out vec3 FragPos;
 
 out VS_OUT{
 	vec3 clipSpaceNormal;
@@ -28,6 +29,7 @@ void main(){
 	Normal = mat3(transpose(inverse(model))) * aNormal;
 	WorldPos = vec3(model * vec4(aPos, 1.0));
 	TexCoords = aTexCoords;
+	FragPos = aPos;
 
 	mat3 normalMatrix = mat3(transpose(inverse(view * model)));
 	vs_out.clipSpaceNormal = normalize(vec3(projection * vec4(normalMatrix * Normal, 1.0)));
