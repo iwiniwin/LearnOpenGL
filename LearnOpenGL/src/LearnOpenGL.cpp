@@ -19,6 +19,7 @@ using namespace std;
 #include "scenes/instancing_scene.h"
 #include "scenes/anti_aliasing_scene.h"
 #include "scenes/blinn_phong_scene.h"
+#include "scenes/gamma_scene.h"
 
 Scene* loadScene() {
 	//return new MultipleLightScene;
@@ -32,7 +33,8 @@ Scene* loadScene() {
 	//return new GeometryShaderScene;
 	//return new InstancingScene;
 	//return new AntiAliasingScene;
-	return new BlinnPhongScene;
+	//return new BlinnPhongScene;
+	return new GammaScene;
 }
 
 extern const unsigned int SCR_WIDTH;
