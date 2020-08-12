@@ -25,6 +25,9 @@ public:
 
 		shader = new Shader("shaders\\shader.vs", "shaders\\gamma_correction.fs");
 		initVAO();
+
+		// 告诉OpenGL将颜色存储到颜色缓冲前先校正sRGB颜色
+		//glEnable(GL_FRAMEBUFFER_SRGB);
 	}
 
 	void initVAO() {
