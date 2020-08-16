@@ -38,7 +38,7 @@ public:
 		depthShader = new Shader("shaders\\simple_depth_shader.vs", "shaders\\empth.fs");
 		shader = new Shader("shaders\\shader.vs", "shaders\\shadow_mapping.fs");
 		cubeShader = new Shader("shaders\\shader.vs", "shaders\\single_tex_shader.fs");
-		quadShder = new Shader("shaders\\ndc_shader.vs", "shaders\\single_tex_shader.fs");
+		quadShder = new Shader("shaders\\ndc_shader.vs", "shaders\\single_depth_tex_shader.fs");
 		initVAO();
 
 		initFBO();
@@ -150,8 +150,25 @@ public:
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		// 绘制立方体
 		glBindVertexArray(cubeVAO);
+		// 绘制立方体
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.5f));
+		depthShader->setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.5f));
+		depthShader->setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 2.0f));
+		model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0f)));
+		model = glm::scale(model, glm::vec3(0.25f));
+		depthShader->setMat4("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// 调试
@@ -194,12 +211,6 @@ public:
 		//glBindVertexArray(cubeVAO);
 		//glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
-
-	void renderScene() {
-		
-		
-	}
-
 
 	virtual void destroy() {
 		delete(shader);
