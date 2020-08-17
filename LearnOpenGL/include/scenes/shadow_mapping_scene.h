@@ -36,7 +36,7 @@ public:
 		camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 		depthShader = new Shader("shaders\\simple_depth_shader.vs", "shaders\\empth.fs");
-		shader = new Shader("shaders\\shader.vs", "shaders\\shadow_mapping.fs");
+		shader = new Shader("shaders\\shadow_mapping.vs", "shaders\\shadow_mapping.frag");
 		cubeShader = new Shader("shaders\\shader.vs", "shaders\\single_tex_shader.fs");
 		quadShder = new Shader("shaders\\ndc_shader.vs", "shaders\\single_depth_tex_shader.fs");
 		initVAO();
@@ -144,9 +144,8 @@ public:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
-		depthShader->setMat4("model", model);
-
 		// 绘制地板
+		depthShader->setMat4("model", model);
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -171,45 +170,56 @@ public:
 		depthShader->setMat4("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		// 调试
-		// 绘制深度贴图到四边形
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, width, height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glBindVertexArray(quadVAO);
-		quadShder->use();
-		//quadShder
-		glActiveTexture(0);
-		glBindTexture(GL_TEXTURE_2D, depthMap);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-
-		glBindVertexArray(0);
-
+		// 调试
+		// 绘制深度贴图到四边形
+		//glBindVertexArray(quadVAO);
+		//quadShder->use();
+		//glActiveTexture(0);
+		//glBindTexture(GL_TEXTURE_2D, depthMap);
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		// 2. 像往常一样渲染场景，同时使用上一步生成的深度贴图
 
-		
-
 		// 绘制地板
-		//shader->use();
-		//shader->setMat4("projection", projection);
-		//shader->setMat4("view", view);
-		//shader->setMat4("model", model);
-		//glBindVertexArray(VAO);
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, texture);
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		shader->use();
+		shader->setMat4("projection", projection);
+		shader->setMat4("view", view);
+		model = glm::mat4(1.0f);
+		shader->setMat4("model", model);
+		shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		shader->setVec3("lightPos", lightPos);
+		shader->setVec3("viewPos", camera.Position);
+		glBindVertexArray(VAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		//// 绘制立方体
-		//cubeShader->use();
-		//cubeShader->setMat4("model", model);
-		//cubeShader->setMat4("view", view);
-		//cubeShader->setMat4("projection", projection);
-		//cubeShader->setVec3("cameraPos", camera.Position);
-		//glBindVertexArray(cubeVAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		// 绘制立方体
+		glBindVertexArray(cubeVAO);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.5f));
+		shader->setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(0.5f));
+		shader->setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 2.0f));
+		model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0f)));
+		model = glm::scale(model, glm::vec3(0.25f));
+		shader->setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		glBindVertexArray(0);
 	}
 
 	virtual void destroy() {
