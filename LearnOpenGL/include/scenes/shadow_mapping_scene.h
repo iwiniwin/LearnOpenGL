@@ -93,6 +93,10 @@ public:
 
 		this->quadShder->use();
 		this->quadShder->setInt("texture1", 0);
+
+		shader->use();
+		shader->setInt("texture1", 0);
+		shader->setInt("depthMap", 1);
 	}
 
 	void initFBO() {
@@ -176,13 +180,19 @@ public:
 
 		// 调试
 		// 绘制深度贴图到四边形
-		//glBindVertexArray(quadVAO);
-		//quadShder->use();
-		//glActiveTexture(0);
-		//glBindTexture(GL_TEXTURE_2D, depthMap);
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
+	/*	glBindVertexArray(quadVAO);
+		quadShder->use();
+		glActiveTexture(0);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+		glDrawArrays(GL_TRIANGLES, 0, 6);*/
+
 
 		// 2. 像往常一样渲染场景，同时使用上一步生成的深度贴图
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
 
 		// 绘制地板
 		shader->use();
@@ -194,8 +204,6 @@ public:
 		shader->setVec3("lightPos", lightPos);
 		shader->setVec3("viewPos", camera.Position);
 		glBindVertexArray(VAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		// 绘制立方体
