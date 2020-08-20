@@ -16,13 +16,22 @@ uniform sampler2D depthMap;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 
-float calculateShadow(vec4 fragPosLightSpace){
+float calculateShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir){
     // 执行透视除法
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     // 由于深度贴图值是在0到1之间，而projCoords是在-1到1之间，所以需要转换到相同范围
     projCoords = projCoords * 0.5 + 0.5;
     float closestDepth = texture(depthMap, projCoords.xy).r;
-    float shadow = projCoords.z > closestDepth ? 1 : 0;
+    
+	// float shadow = projCoords.z > closestDepth ? 1 : 0;
+
+	// 阴影偏移
+//	float bias = 0.005;
+
+	float bias = max(0.05 * (1 - dot(normal, lightDir)), 0.005);
+
+	float shadow = projCoords.z - bias > closestDepth ? 1 : 0;
+
     return shadow;
 }
 
@@ -44,7 +53,7 @@ void main(){
     vec3 specular = spec * lightColor;
 
     // shadow
-    float shadow = calculateShadow(fs_in.FragPosLightSpace);
-    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
+    float shadow = calculateShadow(fs_in.FragPosLightSpace, normal, lightDir);
+    vec3 lighting = ambient + (1.0 - shadow) * (diffuse + specular) * color;
     FragColor = vec4(lighting, 1.0);
 }
