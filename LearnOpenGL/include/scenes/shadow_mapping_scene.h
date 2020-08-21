@@ -109,8 +109,13 @@ public:
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		GLfloat borderColor[] = {1.0, 1.0, 1.0, 1.0};
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
 		// 仅用于渲染深度贴图，所以颜色缓冲没有用，但是帧缓冲必须要有个颜色缓冲
@@ -121,10 +126,13 @@ public:
 	}
 
 	virtual void update(GLFWwindow* window, float deltaTime) {
+		glEnable(GL_CULL_FACE);
+
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		// 清除颜色缓冲和深度缓冲
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		glCullFace(GL_FRONT);
 		
 		glm::vec3 lightPos(-2.0f, 4.0f, -1.0f);
 
@@ -154,7 +162,14 @@ public:
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		glBindVertexArray(cubeVAO);
+
 		// 绘制立方体
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-2.5f, -0.25f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.5f));
+		depthShader->setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.5f));
@@ -178,14 +193,20 @@ public:
 		glViewport(0, 0, width, height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		glCullFace(GL_BACK);
+
+		glDisable(GL_CULL_FACE);
+
+
 		// 调试
 		// 绘制深度贴图到四边形
-	/*	glBindVertexArray(quadVAO);
-		quadShder->use();
-		glActiveTexture(0);
-		glBindTexture(GL_TEXTURE_2D, depthMap);
-		glDrawArrays(GL_TRIANGLES, 0, 6);*/
+		//glBindVertexArray(quadVAO);
+		//quadShder->use();
+		//glActiveTexture(0);
+		//glBindTexture(GL_TEXTURE_2D, depthMap);
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
+		//return
 
 		// 2. 像往常一样渲染场景，同时使用上一步生成的深度贴图
 
@@ -208,6 +229,14 @@ public:
 
 		// 绘制立方体
 		glBindVertexArray(cubeVAO);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-2.5f, -0.25f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.5f));
+		shader->setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 1.5f, 0.0f));
 		model = glm::scale(model, glm::vec3(0.5f));

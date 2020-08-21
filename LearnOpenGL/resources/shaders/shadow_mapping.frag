@@ -26,12 +26,20 @@ float calculateShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir){
 	// float shadow = projCoords.z > closestDepth ? 1 : 0;
 
 	// ÒõÓ°Æ«ÒÆ
-//	float bias = 0.005;
 
 	float bias = max(0.05 * (1 - dot(normal, lightDir)), 0.005);
 
-	float shadow = projCoords.z - bias > closestDepth ? 1 : 0;
+//	bias = 0;
+	
+//	bias = 0.005;
 
+	if(projCoords.z > 1.0){
+		return 0;
+	}
+
+
+	float shadow = projCoords.z - bias > closestDepth ? 1 : 0;
+	
     return shadow;
 }
 
@@ -54,6 +62,6 @@ void main(){
 
     // shadow
     float shadow = calculateShadow(fs_in.FragPosLightSpace, normal, lightDir);
-    vec3 lighting = ambient + (1.0 - shadow) * (diffuse + specular) * color;
+    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
     FragColor = vec4(lighting, 1.0);
 }
