@@ -21,7 +21,7 @@ float calculateShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir){
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     // 由于深度贴图值是在0到1之间，而projCoords是在-1到1之间，所以需要转换到相同范围
     projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = texture(depthMap, projCoords.xy).r;
+    
     
 	// float shadow = projCoords.z > closestDepth ? 1 : 0;
 
@@ -37,8 +37,21 @@ float calculateShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir){
 		return 0;
 	}
 
+//	float closestDepth = texture(depthMap, projCoords.xy).r;
 
-	float shadow = projCoords.z - bias > closestDepth ? 1 : 0;
+	// pcf
+	float closestDepth = 0;
+	float shadow = 0;
+	vec2 texelSize = 1.0 / textureSize(depthMap, 0);
+	for(int x = -1; x <= 1; x ++){
+		for(int y = -1; y <= 1; y ++){
+			closestDepth = texture(depthMap, projCoords.xy + vec2(x, y) * texelSize).r;
+			shadow += projCoords.z - bias > closestDepth ? 1 : 0;
+		}
+	}
+
+
+	shadow /= 9.0;
 	
     return shadow;
 }
