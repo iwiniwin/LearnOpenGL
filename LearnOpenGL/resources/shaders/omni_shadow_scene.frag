@@ -33,7 +33,7 @@ void main(){
 	vec3 lightColor = vec3(0.3);
 
 	// ambient
-	vec3 ambient = 0.3 * color;
+	vec3 ambient = 0.2 * color;
 
 	// diffuse
 	vec3 lightDir = normalize(lightPos - fs_in.FragPos);

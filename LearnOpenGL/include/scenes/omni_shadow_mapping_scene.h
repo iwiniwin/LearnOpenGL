@@ -148,8 +148,8 @@ public:
 		glm::mat4 model;
 		model = glm::scale(model, glm::vec3(10.0));
 		shader->setMat4("model", model);
-		glDisable(GL_CULL_FACE);
-		shader->setInt("reverse_normals", 1);
+		glDisable(GL_CULL_FACE);  // 最大的立方体是希望绘制内部的，所以把默认剔除关掉
+		shader->setInt("reverse_normals", 1);  // 当从内部绘制物体时，可以反转法线，以保证光照仍然有效
 		renderCube();
 
 		shader->setInt("reverse_normals", 0);
