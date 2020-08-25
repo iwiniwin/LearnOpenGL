@@ -92,5 +92,8 @@
     <ClInclude Include="include\scenes\shadow_mapping_scene.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\scenes\omni_shadow_mapping_scene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
