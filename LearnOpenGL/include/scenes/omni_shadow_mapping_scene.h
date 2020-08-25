@@ -36,6 +36,8 @@ public:
 		initVAO();
 
 		initFBO();
+
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	void initVAO() {
@@ -137,6 +139,8 @@ public:
 		shader->setMat4("projection", projection);
 		shader->setMat4("view", view);
 		shader->setFloat("far_plane", far);
+		shader->setVec3("lightPos", lightPos);
+		shader->setVec3("viewPos", camera.Position);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, woodTexture);
 		glActiveTexture(GL_TEXTURE1);
