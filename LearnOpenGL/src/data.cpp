@@ -173,6 +173,18 @@ float planeVertices2[] = {
 };
 int planeVertices2Size = sizeof(planeVertices2);
 
+float planeVertices3[] = {
+	// positions            // normals         // texcoords
+	-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f,  0.0f,  1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f,  1.0f,  1.0f,
+
+	 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f,  1.0f,  1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f,  1.0f,  0.0f
+};
+int planeVertices3Size = sizeof(planeVertices3);
+
 float quadrangleVertices[] = {
 	// positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
 	0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
