@@ -27,18 +27,42 @@ float shadowCalculation(vec3 fragPos){
 
 	// pcf
 	float shadow = 0.0f;
-	float samples = 4.0;
+	
 	float offset = 0.1;
-	for(float x = -offset; x < offset; x += offset / (samples * 0.5)){
-		for(float y = -offset; y < offset; y += offset / (samples * 0.5)){
-			for(float z = -offset; z < offset; z += offset / (samples * 0.5)){
-				float closetDepth = texture(depthMap, fragToLight + vec3(x, y, z)).r;
-				closetDepth *= far_plane;
-				shadow += (currentDepth - bias > closetDepth ? 1.0 : 0.0);
-			}
-		}
+
+	// 在原始方向向量附近采样，采样量64
+//	float samples = 4.0;
+//	for(float x = -offset; x < offset; x += offset / (samples * 0.5)){
+//		for(float y = -offset; y < offset; y += offset / (samples * 0.5)){
+//			for(float z = -offset; z < offset; z += offset / (samples * 0.5)){
+//				float closetDepth = texture(depthMap, fragToLight + vec3(x, y, z)).r;
+//				closetDepth *= far_plane;
+//				shadow += (currentDepth - bias > closetDepth ? 1.0 : 0.0);
+//			}
+//		}
+//	}
+//	shadow /= (samples * samples * samples);
+	
+	// 使用与原始方向向量垂直的方向进行采样，采样量20
+	vec3 sampleOffsetDirections[20] = vec3[]
+	(
+	   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+	   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+	   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+	   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+	   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+	);
+	float samples = 20;
+	float viewDistance = length(fragPos - viewPos);
+//	float diskRadius = 0.05;
+	
+	for(int i = 0; i < samples; i ++){
+		float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;  // 根据观察者的距离调整半径，当距离更远时，阴影更柔和。更近时阴影更锐利
+		float closestDepth = texture(depthMap, fragToLight + sampleOffsetDirections[i] * diskRadius).r;
+		closestDepth *= far_plane;
+		shadow += (currentDepth - bias > closestDepth ? 1.0 : 0.0);
 	}
-	shadow /= (samples * samples * samples);
+	shadow /= samples;
 
 	return shadow;
 }
