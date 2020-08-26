@@ -22,6 +22,7 @@ using namespace std;
 #include "scenes/gamma_scene.h"
 #include "scenes/shadow_mapping_scene.h"
 #include "scenes/omni_shadow_mapping_scene.h"
+#include "scenes/normal_mapping_scene.h"
 
 Scene* loadScene() {
 	//return new MultipleLightScene;
@@ -38,7 +39,8 @@ Scene* loadScene() {
 	//return new BlinnPhongScene;
 	//return new GammaScene;
 	//return new ShadowMappingScene;
-	return new OmniShadowMappingScene;
+	//return new OmniShadowMappingScene;
+	return new NormalMappingScene;
 }
 
 extern const unsigned int SCR_WIDTH;
