@@ -27,6 +27,8 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 
+out vec3 fColor;
+
 uniform bool reverse_normals;
 
 void main(){
