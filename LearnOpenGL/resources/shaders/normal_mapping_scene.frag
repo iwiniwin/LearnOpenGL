@@ -21,7 +21,7 @@ void main(){
 
 //	vec3 normal = normalize(fs_in.Normal);
 
-	vec3 lightColor = vec3(0.3);
+	vec3 lightColor = vec3(0.6);
 
 	// ambient
 	vec3 ambient = 0.1 * color;
