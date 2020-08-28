@@ -14,8 +14,8 @@ out VS_OUT {
 
 out VS_TANGENT_OUT {
 	vec3 FragPos;
-	vec2 TexCoords;
 	vec3 LightPos;
+	vec2 TexCoords;
 	vec3 ViewPos;
 	vec3 TangentFragPos;
 } vs_tangent_out;
