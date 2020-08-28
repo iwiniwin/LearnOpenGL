@@ -42,6 +42,7 @@
     <ClInclude Include="include\scenes\multiple_light_scene.h" />
     <ClInclude Include="include\scenes\normal_mapping_scene.h" />
     <ClInclude Include="include\scenes\omni_shadow_mapping_scene.h" />
+    <ClInclude Include="include\scenes\parallax_mapping_scene.h" />
     <ClInclude Include="include\scenes\shadow_mapping_scene.h" />
     <ClInclude Include="include\scenes\stencil_scene.h" />
     <ClInclude Include="include\scenes\test_scene.h" />

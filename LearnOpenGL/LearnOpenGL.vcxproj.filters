@@ -98,5 +98,8 @@
     <ClInclude Include="include\scenes\normal_mapping_scene.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\scenes\parallax_mapping_scene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
