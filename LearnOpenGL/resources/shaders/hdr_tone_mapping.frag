@@ -14,6 +14,10 @@ void main(){
 	// Reinhard色调映射
 	mapped = hdrColor / (hdrColor + vec3(1.0));
 
+	// 曝光色调映射
+	float exposure = 0.1;  // 曝光度
+	mapped = vec3(1.0) - exp(-hdrColor * exposure);
+
 	// gamma校正
 	mapped = pow(mapped, vec3(1/2.2));
 

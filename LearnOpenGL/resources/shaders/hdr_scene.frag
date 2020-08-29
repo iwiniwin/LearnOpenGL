@@ -39,7 +39,7 @@ void main(){
 
 		// attenuation
 		float distance = length(fs_in.FragPos - lights[i].Position);
-		result *= 1.0 / (distance * distance);
+		result *= 1.0 / (distance * distance);  // 因为会在后处理做gamma校正，所以这里使用平方
 //		result *= 1.0 / distance;
 
 		lighting += result;
