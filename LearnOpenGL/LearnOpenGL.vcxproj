@@ -37,6 +37,7 @@
     <ClInclude Include="include\scenes\framebuffer_scene.h" />
     <ClInclude Include="include\scenes\gamma_scene.h" />
     <ClInclude Include="include\scenes\geometry_shader_scene.h" />
+    <ClInclude Include="include\scenes\hdr_scene.h" />
     <ClInclude Include="include\scenes\instancing_scene.h" />
     <ClInclude Include="include\scenes\model_scene.h" />
     <ClInclude Include="include\scenes\multiple_light_scene.h" />

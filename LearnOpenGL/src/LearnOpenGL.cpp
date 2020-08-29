@@ -24,6 +24,7 @@ using namespace std;
 #include "scenes/omni_shadow_mapping_scene.h"
 #include "scenes/normal_mapping_scene.h"
 #include "scenes/parallax_mapping_scene.h"
+#include "scenes/hdr_scene.h"
 
 Scene* loadScene() {
 	//return new MultipleLightScene;
@@ -42,7 +43,8 @@ Scene* loadScene() {
 	//return new ShadowMappingScene;
 	//return new OmniShadowMappingScene;
 	//return new NormalMappingScene;
-	return new ParallaxMappingScene;
+	//return new ParallaxMappingScene;
+	return new HDRScene;
 }
 
 extern const unsigned int SCR_WIDTH;
