@@ -53,13 +53,46 @@ vec2 parallaxMapping2(vec2 texCoords, vec3 viewDir){
 	return currentTexCoords;
 }
 
+// 视差遮蔽映射，视差遮蔽映射的代码基于陡峭视差映射
+vec2 parallaxMapping3(vec2 texCoords, vec3 viewDir){
+	// 小技巧，根据观察方向的角度调整层级数量，当垂直看一个表面的时候位移一定比一定角度看时小
+	const float minLayers = 8;
+	const float maxLayers = 32;
+	float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
+
+	float layerDepth = 1.0 / numLayers;  // 每一层的深度
+	float currentLayerDepth = 0.0;  // 当前深度
+
+	vec2 p = viewDir.xy * heightScale;
+	vec2 deltaTexCoords = p / numLayers;  // 每一层沿着p方向移动的差值
+
+	vec2 currentTexCoords = texCoords;
+	float curretnDepthMapValue = texture(dispMap, texCoords).r;
+	while(currentLayerDepth < curretnDepthMapValue){
+		currentTexCoords -= deltaTexCoords;
+		curretnDepthMapValue = texture(dispMap, currentTexCoords).r;
+		currentLayerDepth += layerDepth;
+	}
+
+	vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+	// 获取碰撞前后的采样深度值与层级深度值的差值
+	float afterDepth = curretnDepthMapValue - currentLayerDepth;
+	float beforeDepth = texture(dispMap, prevTexCoords).r - currentLayerDepth + layerDepth;
+
+	float weight = afterDepth / (afterDepth - beforeDepth);
+	vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+	return finalTexCoords;
+}
+
 void main(){
 	vec3 viewDir = normalize(fs_in.TangentViewPos - fs_in.TangentFragPos);
 
 	vec2 texCoords = fs_in.TexCoords;
 
 //	texCoords = parallaxMapping(texCoords, viewDir);  // 进行视差映射
-	texCoords = parallaxMapping2(texCoords, viewDir);  // 进行陡峭视差映射
+//	texCoords = parallaxMapping2(texCoords, viewDir);   进行陡峭视差映射
+	texCoords = parallaxMapping3(texCoords, viewDir);  // 进行视差遮蔽映射
 
 
 	// 当纹理坐标超出[0, 1]后，受纹理的环绕方式的影响，采样会导致真实的效果，简单处理就是当纹理坐标超出范围时，就丢弃这个片段
