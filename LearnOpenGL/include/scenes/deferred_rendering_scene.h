@@ -199,8 +199,12 @@ public:
 			const float constant = 1.0;
 			const float linear = 0.7;
 			const float quadratic = 1.8;
+			float lightMax = std::fmaxf(std::fmaxf(lightColor[i].r, lightColor[i].g), lightColor[i].b);
+			// 利用公式计算光体积半径
+			float radius = (-linear + std::sqrtf(linear * linear - 4 * quadratic * (constant - lightMax * 256.0 / 5.0))) / (2 * quadratic);
 			lightPassShder->setFloat("lights[" + to_string(i) + "].Linear", linear);
 			lightPassShder->setFloat("lights[" + to_string(i) + "].Quadratic", quadratic);
+			lightPassShder->setFloat("lights[" + to_string(i) + "].Radius", radius);
 		}
 		lightPassShder->setVec3("viewPos", camera.Position);
 		renderQuad();
