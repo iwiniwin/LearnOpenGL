@@ -1,56 +1,55 @@
 #version 330 core
-layout (location = 0) out vec4 FragColor;  // 指定片段着色器写入到哪个颜色缓冲，前提是帧缓冲中绑定了多个颜色缓冲
-layout (location = 1) out vec4 BrightColor;  // 指定片段着色器写入到哪个颜色缓冲，MRT，这样可以在一次渲染中就顺便把明亮区域提取了
+out vec4 FragColor;
 
-in VS_OUT {
-	vec3 FragPos;
-	vec3 Normal;
-	vec2 TexCoords;
-} fs_in;
+in vec2 TexCoords;
 
-uniform sampler2D diffuseMap;
+uniform sampler2D gPosition;
+uniform sampler2D gNormal;
+uniform sampler2D gAlbedoSpec;
 
 struct Light {
 	vec3 Position;
 	vec3 Color;
+
+	float Linear;
+	float Quadratic;
 };
 
+const int NR_LIGHTS = 32;
+uniform Light lights[NR_LIGHTS];
 
-uniform Light lights[16];
 uniform vec3 viewPos;
 
 void main(){
-	vec3 color = texture(diffuseMap, fs_in.TexCoords).rgb;
+	
+	// 从G缓冲中获取数据
+	vec3 FragPos = texture(gPosition, TexCoords).rgb;
+	vec3 Normal = texture(gNormal, TexCoords).rgb;
+	vec3 Albedo = texture(gAlbedoSpec, TexCoords).rgb;
+	float Specular = texture(gAlbedoSpec, TexCoords).a;
 
-	vec3 normal = normalize(fs_in.Normal);
-
-	// ambient
-	vec3 ambient = 0.0 * color;
-
-	vec3 lighting = vec3(0.0);
-	for(int i = 0; i < 4; i ++){
+	// 和往常一样计算光照
+	vec3 lighting = Albedo * 0.1;  // 环境光照分量
+	vec3 viewDir = normalize(viewPos - FragPos);
+	for(int i = 0; i < NR_LIGHTS; i ++){
 		// diffuse
-		vec3 lightDir = normalize(lights[i].Position - fs_in.FragPos);
-		float diff = max(dot(lightDir, normal), 0.0f);
-		vec3 diffuse = diff * color * lights[i].Color;
+		vec3 lightDir = normalize(lights[i].Position - FragPos);
+		float diff = max(dot(lightDir, Normal), 0.0f);
+		vec3 diffuse = diff * Albedo * lights[i].Color;
 
-		vec3 result = diffuse;
+		// specular
+		vec3 halfwayDir = normalize(lightDir + viewDir);
+		float spec = pow(max(dot(halfwayDir, Normal), 0.0), 16.0);
+		vec3 specular = lights[i].Color * spec * Specular;
 
 		// attenuation
-		float distance = length(fs_in.FragPos - lights[i].Position);
-		result *= 1.0 / (distance * distance);  // 因为会在后处理做gamma校正，所以这里使用平方
-		// result *= 1.0 / distance;
+		float distance = length(FragPos - lights[i].Position);
+		float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
+		
+		diffuse *= attenuation;
+		specular *= attenuation;
 
-		lighting += result;
+		lighting += diffuse + specular;
 	}
-	// 正常的光照计算
-	FragColor = vec4(lighting + ambient, 1.0f);
-
-	// 提取明亮颜色
-	float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-	if(brightness > 1.0){
-		BrightColor = vec4(FragColor.rgb, 1.0f);
-	}else{
-		BrightColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);  // 注意else的时候也要设置颜色
-	}
+	FragColor = vec4(lighting, 1.0f);
 }
