@@ -27,6 +27,7 @@ using namespace std;
 #include "scenes/hdr_scene.h"
 #include "scenes/bloom_scene.h"
 #include "scenes/deferred_rendering_scene.h"
+#include "scenes/ssao_scene.h"
 
 Scene* loadScene() {
 	//return new MultipleLightScene;
@@ -48,7 +49,8 @@ Scene* loadScene() {
 	//return new ParallaxMappingScene;
 	//return new HDRScene;
 	//return new BloomScene;
-	return new DeferredRenderingScene;
+	//return new DeferredRenderingScene;
+	return new SSAOScene;
 }
 
 extern const unsigned int SCR_WIDTH;
