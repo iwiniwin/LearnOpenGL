@@ -12,11 +12,13 @@ public:
 
 	Shader* geometryPassShader;
 	Shader* lightPassShder;
+	Shader* lightShder;
 
 	unsigned int gBuffer;
 	unsigned int gPosition, gNormal, gAlbedoSpec;
 
 	unsigned int quadVAO;
+	unsigned int cubeVAO;
 
 	Model* nanosuitModel;
 	std::vector<glm::vec3> objectPositions;
@@ -60,7 +62,8 @@ public:
 
 		geometryPassShader = new Shader("shaders\\deferred_rendering_scene.vs", "shaders\\deferred_rendering_mrt.frag");;
 		lightPassShder = new Shader("shaders\\bloom_gaussian_blur.vs", "shaders\\deferred_rendering_scene.frag");
-		
+		lightShder = new Shader("shaders\\deferred_rendering_scene.vs", "shaders\\bloom_light_box.frag");
+
 		lightPassShder->use();
 		lightPassShder->setInt("gPosition", 0);
 		lightPassShder->setInt("gNormal", 1);
@@ -91,6 +94,20 @@ public:
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 		glBindVertexArray(0);
+
+		glGenVertexArrays(1, &cubeVAO);
+		unsigned int cubeVBO;
+		glGenBuffers(1, &cubeVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+		glBufferData(GL_ARRAY_BUFFER, cubeVerticesSize, cubeVertices, GL_STATIC_DRAW);
+		glBindVertexArray(cubeVAO);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	void initFBO() {
@@ -187,6 +204,27 @@ public:
 		}
 		lightPassShder->setVec3("viewPos", camera.Position);
 		renderQuad();
+
+		// 结合延迟渲染与正向渲染
+
+		// 使用g-Buffer中的深度缓冲内容
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);  // 写入到默认帧缓冲
+		glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// 渲染光源立方体
+		lightShder->use();
+		lightShder->setMat4("projection", projection);
+		lightShder->setMat4("view", view);
+		for (unsigned int i = 0; i < lightPositions.size(); i++) {
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, lightPositions[i]);
+			model = glm::scale(model, glm::vec3(0.25f));
+			lightShder->setMat4("model", model);
+			lightShder->setVec4("color", glm::vec4(lightColor[i], 1.0f));
+			renderCube();
+		}
 	}
 
 	void renderQuad() {
@@ -195,6 +233,11 @@ public:
 		glBindVertexArray(0);
 	}
 
+	void renderCube() {
+		glBindVertexArray(cubeVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+	}
 
 	virtual void destroy() {
 
