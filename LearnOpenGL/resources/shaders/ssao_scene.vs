@@ -16,11 +16,14 @@ uniform bool inverse_normals;
 void main(){
 
 	gl_Position = projection * view * model * vec4(aPos, 1.0);
-	FragPos = vec3(model * vec4(aPos, 1.0f));
+
+	// 因为深度值是观察空间的，所以其它矢量也都要转换到观察空间
+
+	FragPos = vec3(view * model * vec4(aPos, 1.0f));
 	TexCoords = aTexCoords;
 
 	vec3 n = inverse_normals ? -aNormal : aNormal;
 
-	mat3 normalMatrix = transpose(inverse(mat3(model)));
+	mat3 normalMatrix = transpose(inverse(mat3(view * model)));
 	Normal = normalize(normalMatrix * n);
 }
