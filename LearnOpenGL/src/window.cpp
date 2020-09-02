@@ -19,6 +19,9 @@ GLFWwindow* initWindow() {
 
 	//glfwWindowHint(GLFW_SAMPLES, 4);  // 使用一个包含4个样本（采样点）的多重采样缓冲
 
+	// 请求一个调试输出上下文
+	// glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+
 	// 创建一个窗口对象，这个对象存放了所有和窗口相关的数据
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
 	if (window == NULL) {

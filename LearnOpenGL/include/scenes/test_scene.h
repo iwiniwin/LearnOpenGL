@@ -54,11 +54,15 @@ public:
 
 		initUBO();
 
-		glEnable(GL_DEPTH_TEST);
+		//int flags;
+		//glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+		//cout << flags << endl;
 
 		// ²âÊÔglCheckErrorº¯Êý
 		//glBindFramebuffer(GL_FRAMEBUFFER, 26);
 		//glCheckError();
+
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	void initVAO() {
