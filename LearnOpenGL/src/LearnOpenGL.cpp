@@ -28,6 +28,7 @@ using namespace std;
 #include "scenes/bloom_scene.h"
 #include "scenes/deferred_rendering_scene.h"
 #include "scenes/ssao_scene.h"
+#include "scenes/freetype_scene.h"
 
 Scene* loadScene() {
 	//return new MultipleLightScene;
@@ -37,7 +38,7 @@ Scene* loadScene() {
 	//return new BlendScene;
 	//return new FrameBufferScene;
 	//return new CubemapScene;
-	return new TestScene;
+	//return new TestScene;
 	//return new GeometryShaderScene;
 	//return new InstancingScene;
 	//return new AntiAliasingScene;
@@ -51,6 +52,7 @@ Scene* loadScene() {
 	//return new BloomScene;
 	//return new DeferredRenderingScene;
 	//return new SSAOScene;
+	return new FreetypeScene;
 }
 
 extern const unsigned int SCR_WIDTH;
