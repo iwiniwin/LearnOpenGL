@@ -2,6 +2,7 @@
 #include <memory>
 #include "scene.h"
 #include "model.h"
+#include "debug.h"
 
 extern float vertices[];
 extern int verticesSize;
@@ -37,7 +38,7 @@ public:
 		testShader4 = new Shader("shaders\\test_shader.vs", "shaders\\test_shader.fs");
 		initVAO();
 		glEnable(GL_PROGRAM_POINT_SIZE);
-
+		
 		tex0 = loadTextureFromFile("textures\\container2.png");
 		tex1 = loadTextureFromFile("textures\\container.jpg");
 
@@ -54,6 +55,10 @@ public:
 		initUBO();
 
 		glEnable(GL_DEPTH_TEST);
+
+		// ²âÊÔglCheckErrorº¯Êý
+		//glBindFramebuffer(GL_FRAMEBUFFER, 26);
+		//glCheckError();
 	}
 
 	void initVAO() {

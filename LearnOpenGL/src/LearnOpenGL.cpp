@@ -37,7 +37,7 @@ Scene* loadScene() {
 	//return new BlendScene;
 	//return new FrameBufferScene;
 	//return new CubemapScene;
-	//return new TestScene;
+	return new TestScene;
 	//return new GeometryShaderScene;
 	//return new InstancingScene;
 	//return new AntiAliasingScene;
@@ -50,7 +50,7 @@ Scene* loadScene() {
 	//return new HDRScene;
 	//return new BloomScene;
 	//return new DeferredRenderingScene;
-	return new SSAOScene;
+	//return new SSAOScene;
 }
 
 extern const unsigned int SCR_WIDTH;

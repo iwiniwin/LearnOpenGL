@@ -27,6 +27,9 @@
     <ClCompile Include="src\window.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\debug.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\shader.h">
@@ -111,6 +114,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\scenes\ssao_scene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\debug.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
